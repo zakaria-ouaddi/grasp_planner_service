@@ -5,8 +5,10 @@
 int main(int argc, char **argv) {
     rclcpp::init(argc, argv);
 
+    auto node = std::make_shared<grasp_planner_service::GraspPlannerService>();
+
     // Spin the node to handle callbacks
-    rclcpp::spin(std::make_shared<GraspPlannerService>());
+    rclcpp::spin(node);
 
     rclcpp::shutdown();
     return 0;

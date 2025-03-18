@@ -5,6 +5,8 @@
 #include "grasp_planner_msgs/srv/plan_grasp.hpp"
 #include "rclcpp/rclcpp.hpp"
 
+namespace grasp_planner_service {
+
 class GraspPlannerService : public rclcpp::Node {
   public:
     /**
@@ -32,5 +34,7 @@ class GraspPlannerService : public rclcpp::Node {
     // Service server member variable
     rclcpp::Service<grasp_planner_msgs::srv::PlanGrasp>::SharedPtr service_;
 };
+
+} // namespace grasp_planner_service
 
 #endif // GRASP_PLANNER_SERVICE_HPP
