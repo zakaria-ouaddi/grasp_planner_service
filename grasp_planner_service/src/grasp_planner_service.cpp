@@ -14,8 +14,8 @@ GraspPlannerService::GraspPlannerService() : Node("grasp_planner_service") {
 void GraspPlannerService::handle_service(
     const std::shared_ptr<grasp_planner_msgs::srv::PlanGrasp::Request> request,
     std::shared_ptr<grasp_planner_msgs::srv::PlanGrasp::Response> response) {
-    RCLCPP_INFO(this->get_logger(), "Received grasp planning request for ",
-                request->object_model_path);
+    RCLCPP_INFO(this->get_logger(), "Received grasp planning request for %s",
+                request->object_model_path.c_str());
 
     // Fill in the response with a dummy grasp pose
     response->grasp_pose.position.x = 0.0;
