@@ -23,4 +23,27 @@ void GraspPlannerService::handle_service(
     response->grasp_pose.position.z = 0.0;
 }
 
+VirtualRobot::RobotPtr
+GraspPlannerService::loadRobot(const std::string &robot_model_path) {
+    VirtualRobot::RobotPtr robot =
+        VirtualRobot::RobotIO::loadRobot(robot_model_path);
+    if (!robot) {
+        RCLCPP_ERROR(this->get_logger(), "Failed to load robot model from: %s",
+                     robot_model_path.c_str());
+    }
+    return robot;
+}
+
+VirtualRobot::ManipulationObjectPtr
+GraspPlannerService::loadObject(const std::string &object_model_path) {
+
+    VirtualRobot::ManipulationObjectPtr object =
+        VirtualRobot::ObjectIO::loadManipulationObject(object_model_path);
+    if (!object) {
+        RCLCPP_ERROR(this->get_logger(), "Failed to load object model from: %s",
+                     object_model_path.c_str());
+    }
+    return object;
+}
+
 } // namespace grasp_planner_service
