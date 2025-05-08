@@ -17,10 +17,26 @@ void GraspPlannerService::handle_service(
     RCLCPP_INFO(this->get_logger(), "Received grasp planning request for %s",
                 request->object_model_path.c_str());
 
-    // Fill in the response with a dummy grasp pose
-    response->grasp_pose.position.x = 0.0;
-    response->grasp_pose.position.y = 0.0;
-    response->grasp_pose.position.z = 0.0;
+    try {
+        // Load the robot and object models
+        VirtualRobot::RobotPtr robot = loadRobot(request->robot_model_path);
+
+        if (!robot) {
+            response->success = false;
+            RCLCPP_INFO(this->get_logger(), "Failed to load robot model: %s",
+                        request->robot_model_path.c_str());
+            return;
+        }
+
+        // Fill in the response with a dummy grasp pose
+        response->grasp_pose.position.x = 0.0;
+        response->grasp_pose.position.y = 0.0;
+        response->grasp_pose.position.z = 0.0;
+    } catch (const std::exception &e) {
+        RCLCPP_ERROR(this->get_logger(), "Exception during grasp planning: %s",
+                     e.what());
+        response->success = false;
+    }
 }
 
 VirtualRobot::RobotPtr
