@@ -58,6 +58,26 @@ class GraspPlannerService : public rclcpp::Node {
     VirtualRobot::ManipulationObjectPtr
     loadObject(const std::string &object_model_path);
 
+    /**
+    * @brief Gets the end effector from the robot
+    * @param robot The robot model
+    * @param end_effector_name Name of the end effector
+    * @return Pointer to the end effector or nullptr if not found
+    */
+    VirtualRobot::EndEffectorPtr getEndEffector(
+        const VirtualRobot::RobotPtr& robot,
+        const std::string& end_effector_name);
+
+    VirtualRobot::RobotPtr robot;
+    VirtualRobot::RobotPtr eefCloned;
+    VirtualRobot::RobotPtr robotObject;
+    VirtualRobot::GraspableSensorizedObjectPtr object;
+    VirtualRobot::EndEffectorPtr eef;
+
+    std::string robotFile;
+    std::string eefName;
+    std::string preshape;
+
     // Service server member variable
     rclcpp::Service<grasp_planner_msgs::srv::PlanGrasp>::SharedPtr service_;
 };
