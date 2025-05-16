@@ -10,6 +10,7 @@
 #include <VirtualRobot/XML/RobotIO.h>
 #include <VirtualRobot/ManipulationObject.h>
 #include <VirtualRobot/XML/ObjectIO.h>
+#include <VirtualRobot/VirtualRobotException.h>
 
 // Simox forward declarations
 namespace VirtualRobot {
@@ -53,9 +54,8 @@ class GraspPlannerService : public rclcpp::Node {
     /**
      * @brief Loads an object model from file
      * @param object_model_path Path to the object model file
-     * @return Pointer to the loaded object or nullptr if loading failed
      */
-    VirtualRobot::ManipulationObjectPtr
+    void
     loadObject(const std::string &object_model_path);
 
     /**
@@ -73,6 +73,8 @@ class GraspPlannerService : public rclcpp::Node {
     VirtualRobot::RobotPtr robotObject;
     VirtualRobot::GraspableSensorizedObjectPtr object;
     VirtualRobot::EndEffectorPtr eef;
+
+    VirtualRobot::GraspSetPtr grasps;
 
     std::string robotFile;
     std::string eefName;

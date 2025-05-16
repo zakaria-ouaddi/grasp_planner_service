@@ -34,6 +34,16 @@ void GraspPlannerService::handle_service(
           return;
         }
 
+        // Load object
+        object = loadObject(request->object_model_path);
+        if (!object) {
+          response->success = false;
+          return;
+        }
+
+        grasps.reset(new VirtualRobot::GraspSet(
+            "planned_grasps", robot->getType(), eef->getName()));
+
         // Fill in the response with a dummy grasp pose
         response->grasp_pose.position.x = 0.0;
         response->grasp_pose.position.y = 0.0;
@@ -56,16 +66,21 @@ GraspPlannerService::loadRobot(const std::string &robot_model_path) {
     return robot;
 }
 
-VirtualRobot::ManipulationObjectPtr
+void
 GraspPlannerService::loadObject(const std::string &object_model_path) {
-
-    VirtualRobot::ManipulationObjectPtr object =
-        VirtualRobot::ObjectIO::loadManipulationObject(object_model_path);
-    if (!object) {
-        RCLCPP_ERROR(this->get_logger(), "Failed to load object model from: %s",
-                     object_model_path.c_str());
+    if (!object_model_path.empty()) {
+        
+        try {
+            object = VirtualRobot::ObjectIO::loadManipulationObject(object_model_path);
+        } catch (VirtualRobot::VirtualRobotException& e) {
+            if (!object) {
+                RCLCPP_ERROR(this->get_logger(), "Failed to load object model from: %s",
+                             object_model_path.c_str());
+                RCLCPP_ERROR(this->get_logger(), "%s", e.what());
+                object = nullptr;
+            }
+        }
     }
-    return object;
 }
 
 VirtualRobot::EndEffectorPtr GraspPlannerService::getEndEffector(
