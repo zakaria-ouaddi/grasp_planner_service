@@ -1,6 +1,8 @@
 // src/grasp_planner_service.cpp
 #include "grasp_planner_service/grasp_planner_service.hpp"
 
+#include <VirtualRobot/Grasping/GraspSet.h>
+
 namespace grasp_planner_service {
 
 GraspPlannerService::GraspPlannerService() : Node("grasp_planner_service") {
@@ -35,14 +37,13 @@ void GraspPlannerService::handle_service(
         }
 
         // Load object
-        object = loadObject(request->object_model_path);
+        loadObject(request->object_model_path);
         if (!object) {
           response->success = false;
           return;
         }
 
-        grasps.reset(new VirtualRobot::GraspSet(
-            "planned_grasps", robot->getType(), eef->getName()));
+        grasps.reset(new VirtualRobot::GraspSet("planned_grasps", robot->getType(), eef->getName()));
 
         // Fill in the response with a dummy grasp pose
         response->grasp_pose.position.x = 0.0;

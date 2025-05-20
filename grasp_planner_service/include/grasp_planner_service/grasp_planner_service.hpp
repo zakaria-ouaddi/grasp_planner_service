@@ -11,6 +11,7 @@
 #include <VirtualRobot/ManipulationObject.h>
 #include <VirtualRobot/XML/ObjectIO.h>
 #include <VirtualRobot/VirtualRobotException.h>
+#include <VirtualRobot/Grasping/GraspSet.h>
 
 // Simox forward declarations
 namespace VirtualRobot {
