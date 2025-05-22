@@ -1,8 +1,6 @@
 // src/grasp_planner_service.cpp
 #include "grasp_planner_service/grasp_planner_service.hpp"
 
-#include <VirtualRobot/Grasping/GraspSet.h>
-
 namespace grasp_planner_service {
 
 GraspPlannerService::GraspPlannerService() : Node("grasp_planner_service") {
@@ -44,8 +42,20 @@ void GraspPlannerService::handle_service(
             return;
         }
 
+        // Reset the grasp set to store the new grasps
         grasps.reset(new VirtualRobot::GraspSet(
             "planned_grasps", robot->getType(), eef->getName()));
+
+        // Setup the planner
+        float qualityThreshold =
+            request->quality_threshold > 0.0 ? request->quality_threshold : 0.2;
+
+        if (planner) {
+            planner->setParameters(qualityThreshold, true);
+        } else {
+            planner.reset(new GraspStudio::GenericGraspPlanner(
+                grasps, qualityMeasure, approach, qualityThreshold, true));
+        }
 
         // Fill in the response with a dummy grasp pose
         response->grasp_pose.position.x = 0.0;
@@ -84,6 +94,24 @@ void GraspPlannerService::loadObject(const std::string &object_model_path) {
                 object = nullptr;
             }
         }
+
+        qualityMeasure.reset(
+            new GraspStudio::GraspQualityMeasureWrenchSpace(object));
+        qualityMeasure->calculateObjectProperties();
+        approach.reset(new GraspStudio::ApproachMovementSurfaceNormal(
+            object, eef, preshape));
+        eefCloned = approach->getEEFRobotClone();
+
+        if (robot && eef) {
+            std::string name = "Grasp Planner - ";
+            name += eef->getName();
+            grasps.reset(
+                new VirtualRobot::GraspSet(name, robot->getType(), eefName));
+        }
+
+        planner.reset(new GraspStudio::GenericGraspPlanner(
+            grasps, qualityMeasure, approach));
+        planner->setVerbose(true);
     }
 }
 

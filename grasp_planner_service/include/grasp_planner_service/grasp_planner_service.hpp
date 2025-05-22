@@ -6,6 +6,10 @@
 #include "rclcpp/rclcpp.hpp"
 
 // Simox includes
+#include <GraspPlanning/ApproachMovementSurfaceNormal.h>
+#include <GraspPlanning/GraspPlanner/GenericGraspPlanner.h>
+#include <GraspPlanning/GraspQuality/GraspQualityMeasureWrenchSpace.h>
+#include <GraspPlanning/GraspStudio.h>
 #include <VirtualRobot/Grasping/GraspSet.h>
 #include <VirtualRobot/ManipulationObject.h>
 #include <VirtualRobot/Robot.h>
@@ -75,6 +79,10 @@ class GraspPlannerService : public rclcpp::Node {
     VirtualRobot::EndEffectorPtr eef;
 
     VirtualRobot::GraspSetPtr grasps;
+
+    GraspStudio::GraspQualityMeasureWrenchSpacePtr qualityMeasure;
+    GraspStudio::ApproachMovementSurfaceNormalPtr approach;
+    GraspStudio::GenericGraspPlannerPtr planner;
 
     std::string robotFile;
     std::string eefName;
