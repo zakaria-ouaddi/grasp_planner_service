@@ -30,20 +30,22 @@ void GraspPlannerService::handle_service(
         }
 
         // Get end effector
-        VirtualRobot::EndEffectorPtr eef = getEndEffector(robot, request->end_effector_name);
+        VirtualRobot::EndEffectorPtr eef =
+            getEndEffector(robot, request->end_effector_name);
         if (!eef) {
-          response->success = false;
-          return;
+            response->success = false;
+            return;
         }
 
         // Load object
         loadObject(request->object_model_path);
         if (!object) {
-          response->success = false;
-          return;
+            response->success = false;
+            return;
         }
 
-        grasps.reset(new VirtualRobot::GraspSet("planned_grasps", robot->getType(), eef->getName()));
+        grasps.reset(new VirtualRobot::GraspSet(
+            "planned_grasps", robot->getType(), eef->getName()));
 
         // Fill in the response with a dummy grasp pose
         response->grasp_pose.position.x = 0.0;
@@ -67,15 +69,16 @@ GraspPlannerService::loadRobot(const std::string &robot_model_path) {
     return robot;
 }
 
-void
-GraspPlannerService::loadObject(const std::string &object_model_path) {
+void GraspPlannerService::loadObject(const std::string &object_model_path) {
     if (!object_model_path.empty()) {
-        
+
         try {
-            object = VirtualRobot::ObjectIO::loadManipulationObject(object_model_path);
-        } catch (VirtualRobot::VirtualRobotException& e) {
+            object = VirtualRobot::ObjectIO::loadManipulationObject(
+                object_model_path);
+        } catch (VirtualRobot::VirtualRobotException &e) {
             if (!object) {
-                RCLCPP_ERROR(this->get_logger(), "Failed to load object model from: %s",
+                RCLCPP_ERROR(this->get_logger(),
+                             "Failed to load object model from: %s",
                              object_model_path.c_str());
                 RCLCPP_ERROR(this->get_logger(), "%s", e.what());
                 object = nullptr;
@@ -84,15 +87,15 @@ GraspPlannerService::loadObject(const std::string &object_model_path) {
     }
 }
 
-VirtualRobot::EndEffectorPtr GraspPlannerService::getEndEffector(
-    const VirtualRobot::RobotPtr& robot,
-    const std::string& end_effector_name)
-{
-  VirtualRobot::EndEffectorPtr eef = robot->getEndEffector(end_effector_name);
-  if (!eef) {
-    RCLCPP_ERROR(this->get_logger(), "End effector not found: %s", end_effector_name.c_str());
-  }
-  return eef;
+VirtualRobot::EndEffectorPtr
+GraspPlannerService::getEndEffector(const VirtualRobot::RobotPtr &robot,
+                                    const std::string &end_effector_name) {
+    VirtualRobot::EndEffectorPtr eef = robot->getEndEffector(end_effector_name);
+    if (!eef) {
+        RCLCPP_ERROR(this->get_logger(), "End effector not found: %s",
+                     end_effector_name.c_str());
+    }
+    return eef;
 }
 
 } // namespace grasp_planner_service

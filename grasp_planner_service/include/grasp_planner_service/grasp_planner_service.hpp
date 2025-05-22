@@ -6,12 +6,12 @@
 #include "rclcpp/rclcpp.hpp"
 
 // Simox includes
-#include <VirtualRobot/Robot.h>
-#include <VirtualRobot/XML/RobotIO.h>
-#include <VirtualRobot/ManipulationObject.h>
-#include <VirtualRobot/XML/ObjectIO.h>
-#include <VirtualRobot/VirtualRobotException.h>
 #include <VirtualRobot/Grasping/GraspSet.h>
+#include <VirtualRobot/ManipulationObject.h>
+#include <VirtualRobot/Robot.h>
+#include <VirtualRobot/VirtualRobotException.h>
+#include <VirtualRobot/XML/ObjectIO.h>
+#include <VirtualRobot/XML/RobotIO.h>
 
 // Simox forward declarations
 namespace VirtualRobot {
@@ -56,18 +56,17 @@ class GraspPlannerService : public rclcpp::Node {
      * @brief Loads an object model from file
      * @param object_model_path Path to the object model file
      */
-    void
-    loadObject(const std::string &object_model_path);
+    void loadObject(const std::string &object_model_path);
 
     /**
-    * @brief Gets the end effector from the robot
-    * @param robot The robot model
-    * @param end_effector_name Name of the end effector
-    * @return Pointer to the end effector or nullptr if not found
-    */
-    VirtualRobot::EndEffectorPtr getEndEffector(
-        const VirtualRobot::RobotPtr& robot,
-        const std::string& end_effector_name);
+     * @brief Gets the end effector from the robot
+     * @param robot The robot model
+     * @param end_effector_name Name of the end effector
+     * @return Pointer to the end effector or nullptr if not found
+     */
+    VirtualRobot::EndEffectorPtr
+    getEndEffector(const VirtualRobot::RobotPtr &robot,
+                   const std::string &end_effector_name);
 
     VirtualRobot::RobotPtr robot;
     VirtualRobot::RobotPtr eefCloned;
