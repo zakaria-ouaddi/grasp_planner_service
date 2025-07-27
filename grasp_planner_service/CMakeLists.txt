@@ -6,55 +6,70 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-# find dependencies
+# Find ROS 2 dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(grasp_planner_msgs REQUIRED)
+find_package(visualization_msgs REQUIRED)
+find_package(tf2_ros REQUIRED)
+find_package(tf2_eigen REQUIRED)
 
-# Find Simox and its dependencies
-find_package(Boost REQUIRED COMPONENTS program_options thread regex)
+# Find Simox and its core dependencies
+find_package(Boost REQUIRED COMPONENTS program_options thread regex system filesystem)
 find_package(Eigen3 REQUIRED)
-find_package(Simox REQUIRED)
+find_package(Simox REQUIRED COMPONENTS VirtualRobot GraspStudio)  # Explicitly request Simox components
 
-include_directories(include)
+# Include directories
+include_directories(
+  include
+  ${EIGEN3_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIRS}
+  ${Simox_INCLUDE_DIRS}
+  
+)
 
+# Library target
 add_library(${PROJECT_NAME}
   src/grasp_planner_service.cpp
 )
 
-message(STATUS "Simox_INCLUDE_DIRS: ${Simox_INCLUDE_DIRS}")
-target_include_directories(${PROJECT_NAME} PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>
-  ${Simox_INCLUDE_DIRS}
-)
-
-message(STATUS "Simox_LIBRARIES: ${Simox_LIBRARIES}")
-# Link dependencies
+# Link Simox and ROS 2 dependencies
 target_link_libraries(${PROJECT_NAME}
   ${Simox_LIBRARIES}
+  ${Boost_LIBRARIES}
+  Eigen3::Eigen
 )
-
-ament_target_dependencies(${PROJECT_NAME}
-rclcpp
-std_msgs
-geometry_msgs
-grasp_planner_msgs
-)
-
-add_executable(${PROJECT_NAME}_node src/grasp_planner_service_node.cpp)
-target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
 
 ament_target_dependencies(${PROJECT_NAME}
   rclcpp
   std_msgs
   geometry_msgs
+  visualization_msgs
+  tf2_ros
+  tf2_eigen
   grasp_planner_msgs
 )
 
-# Install
+# Executable
+add_executable(${PROJECT_NAME}_node 
+  src/grasp_planner_service_node.cpp
+)
+
+add_executable(test_grasp_planner src/test_grasp_planner.cpp)
+target_link_libraries(test_grasp_planner ${PROJECT_NAME})
+ament_target_dependencies(test_grasp_planner
+  rclcpp
+  grasp_planner_msgs
+)
+
+
+target_link_libraries(${PROJECT_NAME}_node
+  ${PROJECT_NAME}
+)
+
+# Install targets
 install(TARGETS
   ${PROJECT_NAME}
   ${PROJECT_NAME}_node
@@ -62,9 +77,12 @@ install(TARGETS
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
+install(TARGETS test_grasp_planner
+  DESTINATION lib/${PROJECT_NAME}
+)
 
 install(DIRECTORY include/
-  DESTINATION include/
+  DESTINATION include
 )
 
 ament_package()

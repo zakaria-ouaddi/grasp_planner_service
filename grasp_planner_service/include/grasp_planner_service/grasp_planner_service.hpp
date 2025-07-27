@@ -1,9 +1,15 @@
-// include/grasp_planner_service/grasp_planner_service.hpp
 #ifndef GRASP_PLANNER_SERVICE_HPP
 #define GRASP_PLANNER_SERVICE_HPP
 
 #include "grasp_planner_msgs/srv/plan_grasp.hpp"
 #include "rclcpp/rclcpp.hpp"
+#include <memory>
+#include <string>
+#include "geometry_msgs/msg/pose_array.hpp"
+#include "visualization_msgs/msg/marker_array.hpp"
+#include "sensor_msgs/msg/joint_state.hpp"
+#include "tf2_ros/static_transform_broadcaster.h"
+#include "tf2_ros/transform_broadcaster.h"
 
 // Simox includes
 #include <GraspPlanning/ApproachMovementSurfaceNormal.h>
@@ -72,24 +78,70 @@ class GraspPlannerService : public rclcpp::Node {
     getEndEffector(const VirtualRobot::RobotPtr &robot,
                    const std::string &end_effector_name);
 
+    /**
+     * @brief Loads and validates all required models
+     */
+    bool load_models(const std::string& robot_path, 
+                    const std::string& object_path,
+                    const std::string& eef_name);
+
+    /**
+     * @brief Initializes the grasp planner components
+     */
+    bool initialize_planner(float quality_threshold, const std::string& preshape_name);
+
+    /**
+     * @brief Executes grasp planning
+     */
+    bool plan_grasps(int timeout_ms);
+
+    /**
+     * @brief Processes and validates the planned grasps
+     */
+    void process_grasps(std::shared_ptr<grasp_planner_msgs::srv::PlanGrasp::Response> response);
+
+    /**
+     * @brief Visualizes all candidate grasps
+     */
+    void visualize_grasps();
+
+    /**
+     * @brief Validates grasp in simulation
+     */
+    bool validate_in_simulation(VirtualRobot::GraspPtr grasp);
+
+    /**
+     * @brief Validates preshape configuration
+     */
+    bool validate_preshape(const std::string& preshape_name);
+
+    // Core components
     VirtualRobot::RobotPtr robot;
     VirtualRobot::RobotPtr eefCloned;
     VirtualRobot::RobotPtr robotObject;
     VirtualRobot::GraspableSensorizedObjectPtr object;
     VirtualRobot::EndEffectorPtr eef;
-
     VirtualRobot::GraspSetPtr grasps;
 
+    // Planning components
     GraspStudio::GraspQualityMeasureWrenchSpacePtr qualityMeasure;
     GraspStudio::ApproachMovementSurfaceNormalPtr approach;
     GraspStudio::GenericGraspPlannerPtr planner;
 
+    // Configuration
     std::string robotFile;
     std::string eefName;
     std::string preshape;
 
-    // Service server member variable
+    // ROS interfaces
     rclcpp::Service<grasp_planner_msgs::srv::PlanGrasp>::SharedPtr service_;
+    rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr joint_state_sub_;
+    rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr grasps_pub_;
+    rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr markers_pub_;
+    std::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
+
+    // State
+    sensor_msgs::msg::JointState current_joint_state_;
 };
 
 } // namespace grasp_planner_service
