@@ -1,0 +1,11 @@
+# Request
+string object_id
+geometry_msgs/Pose grasp_pose
+string end_effector_name
+---
+# Response
+bool success
+float32 quality
+bool is_force_closure
+map<string, float> metrics
+string debug_message

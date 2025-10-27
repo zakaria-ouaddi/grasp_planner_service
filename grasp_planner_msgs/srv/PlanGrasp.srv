@@ -1,15 +1,21 @@
 # grasp_planner_service/srv/PlanGrasp.srv
 
 # Request
-string robot_model_path      # Path to the robot model file
-string object_model_path     # Path to the object model file
-string end_effector_name     # Name of the end effector to use
-string preshape_name         # Optional preshape configuration name
-float32 quality_threshold    # Minimum quality threshold for grasp (0.0-1.0)
-int32 timeout_ms             # Timeout in milliseconds
+string robot_model_path
+string object_model_path
+geometry_msgs/Pose object_pose  # ADDED: Object pose in the world
+string end_effector_name
+string preshape_name
+float32 quality_threshold
+int32 timeout_ms
+int32 num_grasps_to_plan      # ADDED: Number of grasps to find
 ---
 # Response
-bool success                 # Whether a valid grasp was found
-float32 quality              # Quality of the found grasp
-geometry_msgs/Pose grasp_pose # The pose of the end effector for the grasp
-bool is_force_closure        # Whether the grasp is force closure
+bool success
+string error_message          # ADDED: Descriptive error message
+
+# CHANGED: These are now arrays
+float32[] qualities
+geometry_msgs/Pose[] grasp_poses
+bool[] are_force_closure
+

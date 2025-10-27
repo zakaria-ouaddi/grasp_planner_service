@@ -10,10 +10,11 @@ int main(int argc, char** argv) {
     auto node = std::make_shared<grasp_planner_service::GraspPlannerService>();
     
     RCLCPP_INFO(node->get_logger(), 
-               "Starting Grasp Planner Service (MultiThreaded)");
+                "Starting Grasp Planner Service (MultiThreaded)");
     executor.add_node(node);
     executor.spin();
     
     rclcpp::shutdown();
     return 0;
 }
+
