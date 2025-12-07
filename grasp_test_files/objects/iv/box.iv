@@ -1,0 +1,13 @@
+#Inventor V1.0 ascii
+
+Separator {
+    Units {
+            units MILLIMETERS
+    }
+
+    Cube {
+        width 30
+        height 30
+        depth 20
+   }
+}

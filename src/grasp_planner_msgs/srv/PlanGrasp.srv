@@ -1,0 +1,22 @@
+# grasp_planner_service/srv/PlanGrasp.srv
+
+# Request
+string robot_model_path
+string object_model_path
+geometry_msgs/Pose object_pose  # ADDED: Object pose in the world
+string end_effector_name
+string kinematic_chain_name # ADDED: Kinematic chain for IK checks
+string preshape_name
+float32 quality_threshold
+int32 timeout_ms
+int32 num_grasps_to_plan      # ADDED: Number of grasps to find
+---
+# Response
+bool success
+string error_message          # ADDED: Descriptive error message
+
+# CHANGED: These are now arrays
+float32[] qualities
+geometry_msgs/Pose[] grasp_poses
+bool[] are_force_closure
+

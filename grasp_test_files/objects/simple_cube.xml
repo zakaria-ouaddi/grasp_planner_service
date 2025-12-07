@@ -1,0 +1,9 @@
+<!-- simple_cube.xml -->
+<ManipulationObject name="TestCube">
+  <Visualization>
+    <Box size="0.03 0.03 0.03"/>  <!-- 3cm cube -->
+  </Visualization>
+  <CollisionModel>
+    <Box size="0.03 0.03 0.03"/>
+  </CollisionModel>
+</ManipulationObject>
