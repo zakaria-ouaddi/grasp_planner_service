@@ -42,7 +42,9 @@ int main(int argc, char *argv[]) {
   std::cout << "--- Simox Offscreen Rendering ---" << std::endl;
 
   // 2. Setup Data Paths
-  std::string dataPath = "/home/zakaria/grasp_planner/grasp_test_files/";
+  const char *home_env = std::getenv("HOME");
+  std::string home_dir = home_env ? home_env : "/tmp";
+  std::string dataPath = home_dir + "/grasp_planner/grasp_test_files/";
   VirtualRobot::RuntimeEnvironment::addDataPath(dataPath);
   VirtualRobot::RuntimeEnvironment::addDataPath(dataPath + "objects/");
 

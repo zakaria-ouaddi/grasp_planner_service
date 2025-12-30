@@ -315,7 +315,9 @@ void GraspPlannerService::handle_service(
     publish_markers(valid_grasps);
 
     // --- PHASE 3: LOGGING TO DISK ---
-    std::string log_dir = "/home/zakaria/grasp_planner/logs";
+    const char *home_env = std::getenv("HOME");
+    std::string home_path = home_env ? home_env : "/tmp";
+    std::string log_dir = home_path + "/grasp_planner/logs";
     std::string log_file = log_dir + "/grasps.csv";
     try {
       if (!std::filesystem::exists(log_dir)) {
