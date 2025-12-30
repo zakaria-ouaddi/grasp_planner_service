@@ -13,6 +13,9 @@ find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(grasp_planner_msgs REQUIRED)
+find_package(visualization_msgs REQUIRED)
+find_package(tf2_ros REQUIRED)
+find_package(tf2_eigen REQUIRED)
 
 find_package(rosidl_runtime_cpp REQUIRED)
 find_package(eigen3_cmake_module REQUIRED)
@@ -47,8 +50,10 @@ ament_target_dependencies(${PROJECT_NAME}
   rclcpp
   std_msgs
   geometry_msgs
-
   grasp_planner_msgs
+  visualization_msgs
+  tf2_ros
+  tf2_eigen
   rosidl_runtime_cpp
 )
 
@@ -91,6 +96,9 @@ ament_export_dependencies(
   rclcpp
   std_msgs
   geometry_msgs
+  visualization_msgs
+  tf2_ros
+  tf2_eigen
   grasp_planner_msgs
 
 )

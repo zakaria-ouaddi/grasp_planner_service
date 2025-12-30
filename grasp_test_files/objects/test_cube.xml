@@ -1,0 +1,8 @@
+<ManipulationObject name='TestCube'>
+    <Visualization>
+        <File type='inventor'>test_cube.iv</File>
+    </Visualization>
+    <CollisionModel>
+        <File type='inventor'>test_cube.iv</File>
+    </CollisionModel>
+</ManipulationObject>

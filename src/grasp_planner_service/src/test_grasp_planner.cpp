@@ -8,20 +8,23 @@
 class GraspPlannerTester : public rclcpp::Node {
 public:
   GraspPlannerTester() : Node("grasp_planner_tester") {
-    // Initialize with your actual file paths
-    this->declare_parameter(
-        "robot_model_path",
-        "/home/zakaria/grasp_planner/grasp_test_files/ArmarIII-RightArm.xml");
-    this->declare_parameter(
-        "object_model_path",
-        "/home/zakaria/grasp_planner/grasp_test_files/plate.xml");
+    // Dynamic path construction using HOME environment variable
+    std::string home_dir = std::getenv("HOME");
+    std::string default_robot_path =
+        home_dir + "/grasp_planner/grasp_test_files/ArmarIII-RightArm.xml";
+    std::string default_object_path =
+        home_dir + "/grasp_planner/grasp_test_files/objects/WaterBottle.xml";
+
+    // Initialize with dynamic defaults
+    this->declare_parameter("robot_model_path", default_robot_path);
+    this->declare_parameter("object_model_path", default_object_path);
 
     this->declare_parameter("end_effector_name", "Hand R");
     this->declare_parameter("kinematic_chain_name", "RightArm");
-    this->declare_parameter("preshape_name", "");
-    this->declare_parameter("object_pose_x", 500.0);
-    this->declare_parameter("object_pose_y", 200.0);
-    this->declare_parameter("object_pose_z", 200.0);
+    this->declare_parameter("preshape_name", "Power Preshape");
+    this->declare_parameter("object_pose_x", 0.5);
+    this->declare_parameter("object_pose_y", 0.2);
+    this->declare_parameter("object_pose_z", 0.2);
 
     client_ = create_client<grasp_planner_msgs::srv::PlanGrasp>("plan_grasp");
 
@@ -52,14 +55,14 @@ public:
     this->get_parameter("kinematic_chain_name", request->kinematic_chain_name);
     this->get_parameter("preshape_name", request->preshape_name);
 
-    // Hardcoded fallback (replace with your paths)
+    // Ensure paths are not empty
     if (request->robot_model_path.empty()) {
-      request->robot_model_path =
-          "/home/zakaria/grasp_planner/grasp_test_files/ArmarIII-RightArm.xml";
+      RCLCPP_ERROR(get_logger(), "Robot model path is empty!");
+      return;
     }
     if (request->object_model_path.empty()) {
-      request->object_model_path =
-          "/home/zakaria/grasp_planner/grasp_test_files/plate.xml";
+      RCLCPP_ERROR(get_logger(), "Object model path is empty!");
+      return;
     }
 
     // Set object pose from parameters
@@ -73,9 +76,10 @@ public:
     request->object_pose.position.z = z;
     request->object_pose.orientation.w = 1.0;
 
-    request->quality_threshold = 0.001; // Lowered threshold
-    request->timeout_ms = 30000;        // Very long timeout
-    request->num_grasps_to_plan = 100;  // Increased count
+    // Real-world settings: Higher threshold for robust grasps
+    request->quality_threshold = 0.05;
+    request->timeout_ms = 30000;       // Very long timeout
+    request->num_grasps_to_plan = 100; // Increased count
 
     RCLCPP_INFO(get_logger(), "Sending request...");
 

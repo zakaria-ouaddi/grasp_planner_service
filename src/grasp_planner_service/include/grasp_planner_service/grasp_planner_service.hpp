@@ -4,6 +4,8 @@
 #include "geometry_msgs/msg/pose.hpp"
 #include "grasp_planner_msgs/srv/plan_grasp.hpp"
 #include "rclcpp/rclcpp.hpp"
+#include "tf2_ros/transform_broadcaster.h"
+#include "visualization_msgs/msg/marker_array.hpp"
 
 #include <memory>
 #include <string>
@@ -49,6 +51,29 @@ private:
   rclcpp::Service<grasp_planner_msgs::srv::PlanGrasp>::SharedPtr service_;
 
   // --- Components for future phases (Phase 2 & 3) ---
+
+  // Persistent pointers for visualization
+  VirtualRobot::RobotPtr robot;
+  VirtualRobot::ManipulationObjectPtr object;
+
+  /**
+   * @brief Publishes visualization markers for the object and planned grasps
+   */
+  void publish_markers(const std::vector<ValidGrasp> &grasps);
+
+  /**
+   * @brief Publishes visualization marker for the object (uses member 'object')
+   */
+  void publish_object_marker(const Eigen::Matrix4f &object_pose);
+
+  /**
+   * @brief Publishes visualization markers for the full robot structure
+   */
+  void publish_robot_visuals(VirtualRobot::RobotPtr robot_ptr);
+
+  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr
+      markers_pub_;
+  std::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
 };
 
 } // namespace grasp_planner_service
