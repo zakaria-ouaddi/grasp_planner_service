@@ -7,12 +7,14 @@
 #include "visualization_msgs/msg/marker.hpp"
 #include <rclcpp/rclcpp.hpp>
 
-#include <VirtualRobot/VirtualRobot.h>
-#include <VirtualRobot/Visualization/TriMeshModel.h>
-#include <VirtualRobot/Visualization/VisualizationNode.h>
-
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+
+#include <VirtualRobot/SceneObject.h>
+#include <VirtualRobot/VirtualRobot.h>
+#include <VirtualRobot/Visualization/TriMeshModel.h>
+#include <VirtualRobot/Visualization/Visualization.h>
+#include <VirtualRobot/Visualization/VisualizationNode.h>
 
 namespace grasp_planner_service {
 namespace conversions {

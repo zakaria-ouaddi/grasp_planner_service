@@ -89,19 +89,6 @@ void GraspPlannerService::handle_service(
                   tcp_pose(1, 3), tcp_pose(2, 3));
     }
 
-    // 3. Set preshape if specified
-    if (!request->preshape_name.empty()) {
-      if (eef->hasPreshape(request->preshape_name)) {
-        eef->setPreshape(request->preshape_name);
-      } else {
-        response->success = false;
-        response->error_message =
-            "Preshape '" + request->preshape_name + "' not found";
-        RCLCPP_ERROR(this->get_logger(), "%s", response->error_message.c_str());
-        return;
-      }
-    }
-
     // 4. Load object model
     this->object = VirtualRobot::ObjectIO::loadManipulationObject(
         request->object_model_path);
@@ -145,12 +132,43 @@ void GraspPlannerService::handle_service(
                   "Object has no visualization mesh - cannot check size");
     }
 
+    // --- SIZE CHECK (Phase 4 Improvement) ---
+    // Reject objects that are too large for the hand (e.g. > 500mm)
+    float max_dim = 0.0f;
+    if (this->object->getVisualization() &&
+        this->object->getVisualization()->getTriMeshModel()) {
+      auto mesh = this->object->getVisualization()->getTriMeshModel();
+      if (!mesh->vertices.empty()) {
+        Eigen::Vector3f min_pt = mesh->vertices[0];
+        Eigen::Vector3f max_pt = mesh->vertices[0];
+        for (const auto &v : mesh->vertices) {
+          min_pt = min_pt.cwiseMin(v);
+          max_pt = max_pt.cwiseMax(v);
+        }
+        float size_x = max_pt(0) - min_pt(0);
+        float size_y = max_pt(1) - min_pt(1);
+        float size_z = max_pt(2) - min_pt(2);
+        max_dim = std::max({size_x, size_y, size_z});
+
+        RCLCPP_INFO(this->get_logger(), "Object Max Dimension: %.1f mm",
+                    max_dim);
+
+        if (max_dim > 500.0f) {
+          response->success = false;
+          response->error_message = "Object too big (" +
+                                    std::to_string(max_dim) +
+                                    "mm > 500mm). Skipping.";
+          RCLCPP_WARN(this->get_logger(), "%s",
+                      response->error_message.c_str());
+          return;
+        }
+      }
+    }
+
     // 5. DEFER OBJECT POSE - Keep object at origin for grasp planning
     // (Simox ApproachMovementSurfaceNormal requires object at origin)
     Eigen::Matrix4f eigen_object_pose =
         conversions::rosPoseToEigen(request->object_pose);
-    // COMMENTED OUT: this->object->setGlobalPose(eigen_object_pose);
-    // Will set pose AFTER grasp planning for visualization
 
     // DEBUG: Log requested object pose (not yet applied)
     RCLCPP_INFO(this->get_logger(),
@@ -169,16 +187,53 @@ void GraspPlannerService::handle_service(
     t.transform.rotation = request->object_pose.orientation;
     tf_broadcaster_->sendTransform(t);
 
-    // --- VISUALIZATION: Always publish object marker ---
+    // --- VISUALIZATION FIX (Phase 4) ---
+    // 1. Move object to target pose TEMPORARILY
+    this->object->setGlobalPose(eigen_object_pose);
+    // 2. Publish Marker (so user sees it immediately)
     publish_object_marker(eigen_object_pose);
+    // 3. Reset object to Origin (Identity) for Grasp Planner
+    this->object->setGlobalPose(Eigen::Matrix4f::Identity());
 
     // 6. Initialize grasp planning components (CORRECT ORDER FROM PHASE 1)
+
+    // 3. Select Preshape (Phase 4 Improvement: Auto Selection) - MOVED HERE
+    std::string effective_preshape = request->preshape_name;
+    // Automatic Logic based on size
+    if (effective_preshape == "Auto" || effective_preshape.empty()) {
+      if (max_dim > 0 && max_dim < 100.0f) {
+        effective_preshape = "Precision Preshape";
+        RCLCPP_INFO(this->get_logger(),
+                    "Auto-Preshape: Selected 'Precision Preshape' for small "
+                    "object (%.1f mm)",
+                    max_dim);
+      } else {
+        effective_preshape = "Power Preshape";
+        RCLCPP_INFO(this->get_logger(),
+                    "Auto-Preshape: Selected 'Power Preshape' (Default) for "
+                    "object (%.1f mm)",
+                    max_dim);
+      }
+    }
+
+    if (!effective_preshape.empty()) {
+      if (eef->hasPreshape(effective_preshape)) {
+        eef->setPreshape(effective_preshape);
+      } else {
+        response->success = false;
+        response->error_message =
+            "Preshape '" + effective_preshape + "' not found in Robot Model";
+        RCLCPP_ERROR(this->get_logger(), "%s", response->error_message.c_str());
+        return;
+      }
+    }
+
     qualityMeasure.reset(
         new GraspStudio::GraspQualityMeasureWrenchSpace(this->object));
 
     // Create approach FIRST (before calculating properties)
     approach.reset(new GraspStudio::ApproachMovementSurfaceNormal(
-        this->object, eef, request->preshape_name));
+        this->object, eef, effective_preshape));
 
     // CRITICAL: Clone the EEF (Phase 1 requirement)
     VirtualRobot::RobotPtr eefCloned = approach->getEEFRobotClone();

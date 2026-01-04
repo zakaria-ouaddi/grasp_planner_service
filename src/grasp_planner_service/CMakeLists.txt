@@ -100,7 +100,30 @@ ament_export_dependencies(
   tf2_ros
   tf2_eigen
   grasp_planner_msgs
-
 )
+
+if(BUILD_TESTING)
+  find_package(ament_cmake_gtest REQUIRED)
+  
+  ament_add_gtest(test_conversions test/test_conversions.cpp)
+  target_link_libraries(test_conversions 
+    ${Simox_LIBRARIES}
+    Eigen3::Eigen
+    ${PROJECT_NAME} # Link to the library we defined above
+  )
+  ament_target_dependencies(test_conversions 
+    rclcpp 
+    geometry_msgs
+  )
+
+  ament_add_gtest(test_service_logic test/test_service_logic.cpp)
+  target_link_libraries(test_service_logic 
+    ${Simox_LIBRARIES}
+    Eigen3::Eigen
+    ${PROJECT_NAME} 
+  )
+  ament_target_dependencies(test_service_logic rclcpp grasp_planner_msgs)
+
+endif()
 
 ament_package()
