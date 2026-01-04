@@ -1,0 +1,32 @@
+scenarios:
+  - name: "Cube Easy"
+    object_path: "/home/zakaria/grasp_planner/grasp_test_files/objects/test_cube.xml"
+    pose: {x: 0.1, y: 0.6, z: 0.8, roll: 0, pitch: 0, yaw: 0}
+    preshape: "Power Preshape"
+    runs: 5
+
+  - name: "Cube Rotated"
+    object_path: "/home/zakaria/grasp_planner/grasp_test_files/objects/test_cube.xml"
+    pose: {x: 0.2, y: 0.5, z: 0.8, roll: 45, pitch: 0, yaw: 0}
+    preshape: "Power Preshape"
+    runs: 5
+
+  - name: "Bottle Upright"
+    object_path: "/home/zakaria/grasp_planner/grasp_test_files/objects/WaterBottle.xml"
+    pose: {x: 0.1, y: 0.6, z: 0.8, roll: 0, pitch: 0, yaw: 0}
+    preshape: "Power Preshape"
+    runs: 5
+
+  - name: "Bottle Tilted"
+    object_path: "/home/zakaria/grasp_planner/grasp_test_files/objects/WaterBottle.xml"
+    pose: {x: 0.1, y: 0.6, z: 0.8, roll: 0, pitch: 10, yaw: 90}
+    preshape: "Power Preshape"
+    runs: 5
+
+planner_settings:
+  timeout_ms: 30000
+  num_grasps: 20
+  quality_threshold: 0.01
+  robot_path: "/home/zakaria/grasp_planner/grasp_test_files/robots/ArmarIII/ArmarIII.xml"
+  end_effector: "Hand R"
+  kinematic_chain: "TorsoRightArm"
