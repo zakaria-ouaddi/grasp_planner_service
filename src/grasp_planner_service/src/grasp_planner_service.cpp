@@ -20,10 +20,13 @@ GraspPlannerService::GraspPlannerService() : Node("grasp_planner_service") {
                               std::placeholders::_1, std::placeholders::_2));
 
   // Initialize publisher for markers (Standard QoS to match default RViz)
+  // Context: Visualization is critical for debugging grasp quality.
   markers_pub_ = this->create_publisher<visualization_msgs::msg::MarkerArray>(
       "grasp_markers", rclcpp::QoS(10));
 
   // Initialize TF broadcaster
+  // Context: Used to broadcast the object's frame so RViz can render it
+  // correctly relative to the world.
   tf_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(this);
 
   RCLCPP_INFO(this->get_logger(),
@@ -52,6 +55,10 @@ void GraspPlannerService::handle_service(
 
   try {
     // 1. Load the robot model
+    // Origin: Simox VirtualRobot Library (RobotIO)
+    // Method: Loads the XML robot description file specified in the request.
+    // Why: We need the full kinematic model to calculate IK and check
+    // collisions.
     this->robot = VirtualRobot::RobotIO::loadRobot(request->robot_model_path);
     if (!this->robot) {
       response->success = false;
@@ -67,6 +74,9 @@ void GraspPlannerService::handle_service(
                 this->robot->getRobotNodes().size());
 
     // NEW: Publish Robot Visuals immediately
+    // Why: Ensures the user sees the robot structure in RViz as soon as it's
+    // loaded,
+    //      verifying the path was correct.
     publish_robot_visuals(this->robot);
 
     // 2. Get end effector
@@ -90,6 +100,9 @@ void GraspPlannerService::handle_service(
     }
 
     // 4. Load object model
+    // Origin: Simox VirtualRobot Library (ObjectIO)
+    // Method: Loads the manipulation object (usually XML or IV file).
+    // Why: The object model (geometry) is the target for grasp planning.
     this->object = VirtualRobot::ObjectIO::loadManipulationObject(
         request->object_model_path);
     if (!this->object) {
@@ -167,6 +180,9 @@ void GraspPlannerService::handle_service(
 
     // 5. DEFER OBJECT POSE - Keep object at origin for grasp planning
     // (Simox ApproachMovementSurfaceNormal requires object at origin)
+    // Why: The grasp planner algorithms assume the object is at (0,0,0).
+    //      We apply the user-requested pose *after* planning to transform the
+    //      grasps to the world frame.
     Eigen::Matrix4f eigen_object_pose =
         conversions::rosPoseToEigen(request->object_pose);
 
@@ -189,10 +205,14 @@ void GraspPlannerService::handle_service(
 
     // --- VISUALIZATION FIX (Phase 4) ---
     // 1. Move object to target pose TEMPORARILY
+    // Why: To show the user where the object is in the world frame before we
+    // start planning.
     this->object->setGlobalPose(eigen_object_pose);
     // 2. Publish Marker (so user sees it immediately)
     publish_object_marker(eigen_object_pose);
     // 3. Reset object to Origin (Identity) for Grasp Planner
+    // Why: As mentioned, GraspStudio requires the object to be at Identity for
+    // surface normal calculation.
     this->object->setGlobalPose(Eigen::Matrix4f::Identity());
 
     // 6. Initialize grasp planning components (CORRECT ORDER FROM PHASE 1)
@@ -200,6 +220,8 @@ void GraspPlannerService::handle_service(
     // 3. Select Preshape (Phase 4 Improvement: Auto Selection) - MOVED HERE
     std::string effective_preshape = request->preshape_name;
     // Automatic Logic based on size
+    // Why: Small objects require precision grasps (fingertips), while large
+    // objects need power grasps (palm).
     if (effective_preshape == "Auto" || effective_preshape.empty()) {
       if (max_dim > 0 && max_dim < 100.0f) {
         effective_preshape = "Precision Preshape";
@@ -228,26 +250,42 @@ void GraspPlannerService::handle_service(
       }
     }
 
+    // Origin: Simox GraspStudio
+    // Method: Quality Measure based on Wrench Space (Grasp Wrench Space - GWS).
+    //         Evaluates how well the grasp resists disturbances in all
+    //         directions.
     qualityMeasure.reset(
         new GraspStudio::GraspQualityMeasureWrenchSpace(this->object));
 
     // Create approach FIRST (before calculating properties)
+    // Origin: Simox GraspStudio
+    // Method: Approach Movement based on Surface Normals.
+    //         The end effector approaches the object along the negative surface
+    //         normal at a sampled point.
     approach.reset(new GraspStudio::ApproachMovementSurfaceNormal(
         this->object, eef, effective_preshape));
 
     // CRITICAL: Clone the EEF (Phase 1 requirement)
+    // Why: Simox requires a clone of the end effector to perform collision-free
+    // planning
+    //      without modifying the original robot model during the search.
     VirtualRobot::RobotPtr eefCloned = approach->getEEFRobotClone();
 
     // THEN calculate object properties
     qualityMeasure->calculateObjectProperties();
 
     // Create new grasp set
+    // Container to store the planned grasps.
     grasps.reset(new VirtualRobot::GraspSet(
         "ros_planned_grasps", this->robot->getType(), eef->getName()));
 
     // Setup planner with quality threshold and force closure requirement (last
     // param = true)
     // Setup planner (Force Closure optional for better hit rate)
+    // Origin: Simox GraspStudio (GenericGraspPlanner)
+    // Method: The workhorse of the planning process. Validates candidates
+    // generated by 'approach'
+    //         using 'qualityMeasure'.
     planner.reset(new GraspStudio::GenericGraspPlanner(
         grasps, qualityMeasure, approach, request->quality_threshold, false));
     planner->setVerbose(true); // Keep verbose for now
@@ -283,6 +321,9 @@ void GraspPlannerService::handle_service(
     // --- PHASE 2: REACHABILITY & COLLISION AVOIDANCE ---
 
     // 2.1 Setup IK Solver (if chain specified)
+    // Origin: Simox VirtualRobot (DifferentialIK)
+    // Method: Uses Jacobian transpose/pseudo-inverse to solve inverse
+    // kinematics.
     VirtualRobot::DifferentialIKPtr ikSolver = nullptr;
     VirtualRobot::RobotNodeSetPtr rns = nullptr;
     if (!request->kinematic_chain_name.empty()) {
@@ -297,6 +338,9 @@ void GraspPlannerService::handle_service(
     }
 
     // 2.2 Setup Collision Detection
+    // Origin: Simox VirtualRobot (CDManager)
+    // Method: Manages collision pairs and checks for intersections between
+    // models.
     VirtualRobot::CDManagerPtr cdManager(new VirtualRobot::CDManager());
     VirtualRobot::SceneObjectSetPtr rnsColModel;
     if (rns) {
@@ -321,6 +365,9 @@ void GraspPlannerService::handle_service(
       // --- REACHABILITY CHECK ---
       if (ikSolver) {
         ikSolver->setGoal(global_tcp_pose);
+        // Method: DifferentialIK::solveIK() attempts to find joint values that
+        // satisfy the target pose.
+        //         Returns true if error is below threshold.
         bool reachable = ikSolver->solveIK();
 
         if (!reachable) {
@@ -331,6 +378,8 @@ void GraspPlannerService::handle_service(
       // --- COLLISION CHECK ---
       if (rnsColModel && cdManager->isInCollision(rnsColModel)) {
         // Collision detected in this configuration
+        // Method: Checks if the robot (at the IK solution) collides with itself
+        // or the environment (if added).
         continue;
       }
 
@@ -420,6 +469,12 @@ void GraspPlannerService::handle_service(
 }
 
 // NEW: Iterates all robot nodes and publishes their meshes to RViz
+// Origin: Custom Visualization Logic
+// Method:
+//   1. Iterates over all RobotNodes in the Simox Robot.
+//   2. Extracts the visualization geometry (triangulated mesh).
+//   3. Passes it to local 'createMeshMarker' helper.
+//   4. Publishes all markers as a MarkerArray.
 void GraspPlannerService::publish_robot_visuals(
     VirtualRobot::RobotPtr robot_ptr) {
   if (!robot_ptr)
@@ -451,7 +506,7 @@ void GraspPlannerService::publish_robot_visuals(
 }
 
 void GraspPlannerService::publish_object_marker(
-    const Eigen::Matrix4f &object_pose) {
+    const Eigen::Matrix4f & /*object_pose*/) {
   visualization_msgs::msg::MarkerArray markers;
 
   // Use the new Mesh Bridge for the object too

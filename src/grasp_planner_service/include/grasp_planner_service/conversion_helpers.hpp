@@ -3,7 +3,6 @@
 
 #include "geometry_msgs/msg/point.hpp"
 #include "geometry_msgs/msg/pose.hpp"
-#include "geometry_msgs/msg/quaternion.hpp"
 #include "visualization_msgs/msg/marker.hpp"
 #include <rclcpp/rclcpp.hpp>
 
@@ -21,7 +20,20 @@ namespace conversions {
 
 /**
  * @brief Converts an Eigen::Matrix4f (Simox mm) to a geometry_msgs::msg::Pose
- * (ROS m)
+ * (ROS m).
+ *
+ * Origin: Custom Helper.
+ * Method: 1. Extracts translation and divides by 1000.0 to convert millimeters
+ * to meters.
+ *         2. Extracts rotation matrix, converts to quaternion, and normalizes
+ * it. Context: Simox uses millimeters for all internal units, while ROS uses
+ * meters. This conversion is essential when passing data from the planner to
+ * ROS messages.
+ *
+ * Args:
+ *   eigen_pose: 4x4 Transformation Matrix in mm.
+ * Returns:
+ *   ROS Pose in meters.
  */
 inline geometry_msgs::msg::Pose
 eigenToRosPose(const Eigen::Matrix4f &eigen_pose) {
@@ -45,7 +57,18 @@ eigenToRosPose(const Eigen::Matrix4f &eigen_pose) {
 
 /**
  * @brief Converts a geometry_msgs::msg::Pose (ROS m) to an Eigen::Matrix4f
- * (Simox mm)
+ * (Simox mm).
+ *
+ * Origin: Custom Helper.
+ * Method: 1. Multiplies position by 1000.0 to convert meters to millimeters.
+ *         2. Converts quaternion to rotation matrix.
+ * Context: Required when receiving user requests (in ROS meters) and preparing
+ * them for Simox algorithms (which expect millimeters).
+ *
+ * Args:
+ *   ros_pose: ROS Pose in meters.
+ * Returns:
+ *   4x4 Transformation Matrix in mm.
  */
 inline Eigen::Matrix4f
 rosPoseToEigen(const geometry_msgs::msg::Pose &ros_pose) {
@@ -63,8 +86,27 @@ rosPoseToEigen(const geometry_msgs::msg::Pose &ros_pose) {
 }
 
 /**
- * @brief Creates a TRIANGLE_LIST marker from a Simox SceneObject's geometry
- * @return visualization_msgs::msg::Marker
+ * @brief Creates a TRIANGLE_LIST marker from a Simox SceneObject's geometry.
+ *
+ * Origin: Custom Helper (Bridge between Simox and ROS Visualization).
+ * Method: 1. Accesses the `TriMeshModel` from the Simox object.
+ *         2. Iterates through all faces of the mesh.
+ *         3. Transforms each vertex by the object's global pose to get world
+ * coordinates.
+ *         4. Converts vertex units from mm to meters.
+ *         5. Pushes transformed vertices into a `TRIANGLE_LIST` ROS Marker.
+ * Context: Essential for Phase 3 Visualization. Since RViz cannot load Simox
+ * XML models directly, we extract the mesh geometry programmatically and send
+ * it as a raw mesh marker.
+ *
+ * Args:
+ *   sceneObject: Pointer to the Simox object containing visual data.
+ *   ns: Namespace for the marker.
+ *   id: ID for the marker.
+ *   r, g, b: Color components (0.0 - 1.0).
+ *   now: Timestamp for the marker.
+ * Returns:
+ *   Complete visualization_msgs::msg::Marker ready to be published.
  */
 inline visualization_msgs::msg::Marker
 createMeshMarker(VirtualRobot::SceneObjectPtr sceneObject,
@@ -99,6 +141,7 @@ createMeshMarker(VirtualRobot::SceneObjectPtr sceneObject,
   Eigen::Matrix4f globalPose = sceneObject->getGlobalPose();
 
   // Iterate faces and add vertices
+  // Origin: Simox TriMeshModel Data Structure
   for (const auto &face : mesh->faces) {
     // Simox stores vertices in a vector, faces store indices
     if (face.id1 < mesh->vertices.size() && face.id2 < mesh->vertices.size() &&
