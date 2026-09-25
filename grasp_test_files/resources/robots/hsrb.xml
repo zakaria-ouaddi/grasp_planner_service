@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Simox Robot XML Wrapper for Toyota HSR-B (Human Support Robot) -->
+<Robot Type="hsrb" StandardName="hsrb" RootNode="SimoxURDFLoader">
+    <RobotNode name="SimoxURDFLoader">
+        <ChildFromRobot>
+            <File importEEF="true">hsrb_for_simox.urdf</File>
+        </ChildFromRobot>
+    </RobotNode>
+
+    <!-- End-Effector: Compliant Parallel Gripper -->
+    <EndEffector name="r_gripper" base="hand_palm_link" tcp="r_gripper_gcp" gcp="r_gripper_gcp">
+        <Preshape name="Open">
+            <Node name="hand_l_proximal_joint" unit="radian" value="1.0"/>
+            <Node name="hand_r_proximal_joint" unit="radian" value="1.0"/>
+        </Preshape>
+        <Preshape name="open">
+            <Node name="hand_l_proximal_joint" unit="radian" value="1.0"/>
+            <Node name="hand_r_proximal_joint" unit="radian" value="1.0"/>
+        </Preshape>
+        <Preshape name="Power Preshape">
+            <Node name="hand_l_proximal_joint" unit="radian" value="1.0"/>
+            <Node name="hand_r_proximal_joint" unit="radian" value="1.0"/>
+        </Preshape>
+        <Preshape name="Precision Preshape">
+            <Node name="hand_l_proximal_joint" unit="radian" value="1.0"/>
+            <Node name="hand_r_proximal_joint" unit="radian" value="1.0"/>
+        </Preshape>
+        <Preshape name="Closed">
+            <Node name="hand_l_proximal_joint" unit="radian" value="-0.5"/>
+            <Node name="hand_r_proximal_joint" unit="radian" value="-0.5"/>
+        </Preshape>
+        <Preshape name="closed">
+            <Node name="hand_l_proximal_joint" unit="radian" value="-0.5"/>
+            <Node name="hand_r_proximal_joint" unit="radian" value="-0.5"/>
+        </Preshape>
+        <Static>
+            <Node name="hand_palm_link"/>
+        </Static>
+        <Actor name="LeftFinger">
+            <Node name="hand_l_proximal_joint" direction="-1"/>
+            <Node name="hand_l_distal_link" considerCollisions="All"/>
+        </Actor>
+        <Actor name="RightFinger">
+            <Node name="hand_r_proximal_joint" direction="-1"/>
+            <Node name="hand_r_distal_link" considerCollisions="All"/>
+        </Actor>
+    </EndEffector>
+
+    <!-- Kinematic Chain for Arm (5-DOF: lift + arm + wrist) -->
+    <RobotNodeSet name="Arm" kinematicRoot="base_footprint" tcp="r_gripper_gcp">
+        <Node name="arm_lift_joint"/>
+        <Node name="arm_flex_joint"/>
+        <Node name="arm_roll_joint"/>
+        <Node name="wrist_flex_joint"/>
+        <Node name="wrist_roll_joint"/>
+    </RobotNodeSet>
+    <!-- Alias RightArm to Arm so both names work seamlessly -->
+    <RobotNodeSet name="RightArm" kinematicRoot="base_footprint" tcp="r_gripper_gcp">
+        <Node name="arm_lift_joint"/>
+        <Node name="arm_flex_joint"/>
+        <Node name="arm_roll_joint"/>
+        <Node name="wrist_flex_joint"/>
+        <Node name="wrist_roll_joint"/>
+    </RobotNodeSet>
+</Robot>

@@ -1,46 +1,57 @@
-# Phase 3: Visualization, GUI, and System Verification
+# Phase 3: Visualization & Debugging Tools
 
-## 1. Introduction
-Phase 3 was the critical integration phase where the abstract algorithms from Phase 1 (Grasp Generation) and Phase 2 (Reachability) were connected to a user-facing frontend and a powerful visualization backend. 
+## Overview
+Phase 3 focuses on adding visualization capabilities to the grasp planner service to aid in debugging and verification. It introduces RViz markers for the object and planned grasps, TF broadcasting for the object frame, and proper unit scaling between Simox (millimeters) and ROS (meters).
 
-The primary goal was to transition from "Console Logs" to "Visual Verification", allowing us to see exactly what the planner was doing, and providing a GUI to interact with it dynamically.
+## Key Features
 
-## 2. System Architecture
+### 1. Visualization Markers
+- **Object Marker**: A blue cube representing the object pose is published to the `/grasp_markers` topic.
+- **Grasp Markers**: Arrows representing the planned grasp poses are published to the `/grasp_markers` topic.
+    - **Color Coding**: Arrows are colored based on grasp quality (Green = High Quality, Red = Low Quality).
+    - **Scale**: Arrows are scaled for visibility.
 
-### A. The Visualization Bridge ("Simox to RViz")
-I encountered severe issues running Simox's native Qt-based viewer on the modern Wayland Linux environment (Ghost windows, OpenGL errors).I replaced the native viewer entirely with a **ROS2 Visualization Bridge**:
-- **Mechanism**: The service iterates through the Simox `VirtualRobot` scene graph.
-- **Conversion**: It converts internal Simox Triangle Meshes into `visualization_msgs::Marker` (TRIANGLE_LIST).
-- **topics**:
-    - `/robot_model`: Publishes the robot (e.g., ArmarIII) visual mesh.
-    - `/grasp_markers`: Publishes Object meshes (Green) and Grasp Approach Vectors (Arrows).
-- **Result**: We can now visualize Simox's internal state purely inside standard RViz2.
+### 2. TF Broadcasting
+- The service now broadcasts a transform from `world` to `object_frame` using `tf2_ros::TransformBroadcaster`.
+- This allows RViz to correctly visualize the object and grasps relative to the world frame.
 
-### B. The Python GUI Client
-To enable rapid testing without recompiling C++ code,I built a Python `Tkinter` GUI (`gui_client.py`):
-- **Dynamic Configuration**: Allows changing the Robot XML, Object XML, and Kinematic Chain at runtime.
-- **6D Pose Control**: Added inputs for X, Y, Z Position and Roll, Pitch, Yaw Orientation (converting Euler Angles to Quaternions under the hood).
-- **Quality Tuning**: Exposes the `quality_threshold` parameter to filter weak grasps.
+### 3. Unit Scaling
+- **Simox**: Uses millimeters.
+- **ROS**: Uses meters.
+- **Conversion**:
+    - Input object pose (ROS) is converted to Simox (mm) by multiplying position by 1000.0.
+    - Output grasp poses (Simox) are converted to ROS (m) by dividing position by 1000.0.
 
-### C. Persistent Data Logging
-To analyze planner performance over time,I implemented a CSV logger in the C++ service:
-- **Path**: `/grasp_planner/logs/grasps.csv`
-- **Data**: Timestamp, Object Name, Grasp Quality Score, 6D Pose.
+### 4. RViz Configuration
+- A default RViz configuration file is provided at `config/grasp_planner.rviz`.
+- It is pre-configured to show:
+    - Robot Model
+    - Grasp Markers
+    - TF Frames
 
----
+## Usage
 
-## 3. The "No Valid Grasps" Investigation
-The bulk of Phase 3 was dedicated to solving a critical failure where the planner returned 0 grasps. This wasn't a simple bug, but a complex interaction of 5 distinct issues (Geometric, Logic, and Configuration) which are detailed in the **Debugging Log**.
+### Build
+```bash
+colcon build --packages-select grasp_planner_service
+```
 
-The final working solution involved a precise pipeline:
-1.  **Initialize**: Load Robot and Object at the Origin (0,0,0).
-2.  **Generate**: Run `GenericGraspPlanner` (Simox requires objects at origin for surface normal calculation).
-3.  **Move**: Apply the user's requested pose (e.g., Z=0.8m) to the object *after* generation.
-4.  **Visualize**: Re-publish the object marker at the new pose to verify alignment.
-5.  **Verify**: Run Reachability/Collision checks on the moved object.
+### Run Service
+```bash
+ros2 run grasp_planner_service grasp_planner_service_node
+```
 
-## 4. Final Status
-- **Phase 1 (Grasping)**: Verified (50+ grasps generated per request).
-- **Phase 2 (Reachability)**: Verified (Grasps inside robot body are filtered out).
-- **Phase 3 (Viz/GUI)**: Verified (Full visual confirmation in RViz).
+### Run Test Client
+```bash
+ros2 run grasp_planner_service test_grasp_planner
+```
 
+### Run RViz
+```bash
+rviz2 -d src/grasp_planner_service/config/grasp_planner.rviz
+```
+
+## Dependencies
+- `visualization_msgs`
+- `tf2_ros`
+- `tf2_eigen`

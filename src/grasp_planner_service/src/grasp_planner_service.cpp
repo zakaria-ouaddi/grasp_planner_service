@@ -10,11 +10,37 @@
 #include <fstream>
 #include <iostream>
 
+#include <VirtualRobot/RuntimeEnvironment.h>
+
 namespace grasp_planner_service {
 
 // This constructor is now correct. It no longer initializes
 // the Simox variables that we removed from the header.
 GraspPlannerService::GraspPlannerService() : Node("grasp_planner_service") {
+  // --- SIMOX DATA PATH REGISTRATION ---
+  // Fix for loading URDFs that use package:// URIs when the package is not
+  // installed. We add the grasp_test_files directory to Simox's search path.
+  // This allows it to find "package://iai_pr2_description/..." inside
+  // "grasp_test_files".
+
+  // Register Simox URDF importer factory so URDF-based robots can be loaded
+  VirtualRobot::SimoxURDFFactory::createInstance(nullptr);
+
+  const char *home_env = std::getenv("HOME");
+  if (home_env) {
+    std::string home_path = home_env;
+    std::string test_files_path = home_path + "/grasp_planner/grasp_test_files";
+
+    // Add root and resource directories
+    VirtualRobot::RuntimeEnvironment::addDataPath(test_files_path);
+    VirtualRobot::RuntimeEnvironment::addDataPath(test_files_path + "/resources/robots");
+    VirtualRobot::RuntimeEnvironment::addDataPath(test_files_path + "/resources/objects");
+    VirtualRobot::RuntimeEnvironment::addDataPath(test_files_path + "/iai_pr2");
+
+    RCLCPP_INFO(this->get_logger(), "Added Simox data paths: %s and resources",
+                test_files_path.c_str());
+  }
+
   service_ = this->create_service<grasp_planner_msgs::srv::PlanGrasp>(
       "plan_grasp", std::bind(&GraspPlannerService::handle_service, this,
                               std::placeholders::_1, std::placeholders::_2));
@@ -38,14 +64,13 @@ void GraspPlannerService::handle_service(
     std::shared_ptr<grasp_planner_msgs::srv::PlanGrasp::Response> response) {
   RCLCPP_INFO(this->get_logger(), "Received grasp request for object: %s",
               request->object_model_path.c_str());
+  RCLCPP_INFO(this->get_logger(), "Request robot: %s",
+              request->robot_model_path.c_str());
 
-  // --- THREAD-SAFETY: Reset member variables for this request ---
-  // Note: Is it thread safe? "this->robot" implies shared state.
-  // If we want thread safety we should not use members, but for this Bridge I
-  // will use members assuming single-threaded service callback execution or
-  // accepted risk for now.
+  RCLCPP_INFO(this->get_logger(), "DEBUG: Resetting member pointers...");
   this->robot = nullptr;
   this->object = nullptr;
+  RCLCPP_INFO(this->get_logger(), "DEBUG: Reset complete. Now loading robot via RobotIO::loadRobot...");
 
   VirtualRobot::EndEffectorPtr eef = nullptr;
   VirtualRobot::GraspSetPtr grasps = nullptr;
@@ -54,12 +79,8 @@ void GraspPlannerService::handle_service(
   GraspStudio::GenericGraspPlannerPtr planner = nullptr;
 
   try {
-    // 1. Load the robot model
-    // Origin: Simox VirtualRobot Library (RobotIO)
-    // Method: Loads the XML robot description file specified in the request.
-    // Why: We need the full kinematic model to calculate IK and check
-    // collisions.
     this->robot = VirtualRobot::RobotIO::loadRobot(request->robot_model_path);
+    RCLCPP_INFO(this->get_logger(), "DEBUG: RobotIO::loadRobot returned pointer: %p", (void*)this->robot.get());
     if (!this->robot) {
       response->success = false;
       response->error_message =
@@ -77,6 +98,14 @@ void GraspPlannerService::handle_service(
     // Why: Ensures the user sees the robot structure in RViz as soon as it's
     // loaded,
     //      verifying the path was correct.
+    if (this->robot->hasRobotNode("torso_lift_joint")) {
+      auto torso_node = this->robot->getRobotNode("torso_lift_joint");
+      float torso_target = (torso_node->getJointLimitHi() > 10.0f) ? 300.0f : 0.30f;
+      this->robot->setJointValue("torso_lift_joint", torso_target);
+      RCLCPP_INFO(this->get_logger(),
+                  "Set torso_lift_joint to %.1f (limits: %.1f to %.1f, raised posture for tabletop reach)",
+                  torso_target, torso_node->getJointLimitLo(), torso_node->getJointLimitHi());
+    }
     publish_robot_visuals(this->robot);
 
     // 2. Get end effector
@@ -330,6 +359,100 @@ void GraspPlannerService::handle_service(
       rns = this->robot->getRobotNodeSet(request->kinematic_chain_name);
       if (rns) {
         ikSolver.reset(new VirtualRobot::DifferentialIK(rns));
+
+        // If arm joints are all 0 (singular fully extended pose), seed with natural posture:
+        bool allZero = true;
+        for (float val : rns->getJointValues()) {
+          if (std::abs(val) > 1e-3) {
+            allZero = false;
+            break;
+          }
+        }
+        if (allZero) {
+          auto safeSetJoint = [this](const std::string &name, float val) {
+            if (this->robot->hasRobotNode(name)) {
+              this->robot->setJointValue(name, val);
+            }
+          };
+
+          if (request->kinematic_chain_name == "RightArm" || request->kinematic_chain_name == "Arm") {
+            // PR2 RightArm
+            safeSetJoint("r_shoulder_pan_joint", -0.4f);
+            safeSetJoint("r_shoulder_lift_joint", 0.3f);
+            safeSetJoint("r_upper_arm_roll_joint", -0.5f);
+            safeSetJoint("r_elbow_flex_joint", -1.0f);
+            safeSetJoint("r_forearm_roll_joint", 0.0f);
+            safeSetJoint("r_wrist_flex_joint", -0.5f);
+            safeSetJoint("r_wrist_roll_joint", 0.0f);
+
+            // Tracy RightArm (UR5)
+            safeSetJoint("right_shoulder_pan_joint", 0.0f);
+            safeSetJoint("right_shoulder_lift_joint", -1.57f);
+            safeSetJoint("right_elbow_joint", 1.57f);
+            safeSetJoint("right_wrist_1_joint", -1.57f);
+            safeSetJoint("right_wrist_2_joint", -1.57f);
+            safeSetJoint("right_wrist_3_joint", 0.0f);
+
+            // TIAGo RightArm
+            safeSetJoint("arm_right_1_joint", 0.2f);
+            safeSetJoint("arm_right_2_joint", -0.4f);
+            safeSetJoint("arm_right_3_joint", -0.4f);
+            safeSetJoint("arm_right_4_joint", 1.5f);
+            safeSetJoint("arm_right_5_joint", -1.5f);
+            safeSetJoint("arm_right_6_joint", 0.0f);
+            safeSetJoint("arm_right_7_joint", 0.0f);
+            safeSetJoint("arm_1_joint", 0.2f);
+            safeSetJoint("arm_2_joint", -0.4f);
+            safeSetJoint("arm_3_joint", -0.4f);
+            safeSetJoint("arm_4_joint", 1.5f);
+            safeSetJoint("arm_5_joint", -1.5f);
+            safeSetJoint("arm_6_joint", 0.0f);
+            safeSetJoint("arm_7_joint", 0.0f);
+
+            // HSR-B Arm
+            safeSetJoint("arm_lift_joint", 200.0f);
+            safeSetJoint("arm_flex_joint", -0.8f);
+            safeSetJoint("arm_roll_joint", 0.0f);
+            safeSetJoint("wrist_flex_joint", -0.6f);
+            safeSetJoint("wrist_roll_joint", 0.0f);
+
+            // Stretch Arm
+            safeSetJoint("joint_lift", 500.0f);
+            safeSetJoint("joint_arm_l0", 30.0f);
+            safeSetJoint("joint_arm_l1", 30.0f);
+            safeSetJoint("joint_arm_l2", 30.0f);
+            safeSetJoint("joint_arm_l3", 30.0f);
+            safeSetJoint("joint_wrist_yaw", 0.0f);
+            safeSetJoint("joint_wrist_pitch", 0.0f);
+            safeSetJoint("joint_wrist_roll", 0.0f);
+          } else if (request->kinematic_chain_name == "LeftArm") {
+            // PR2 LeftArm
+            safeSetJoint("l_shoulder_pan_joint", 0.4f);
+            safeSetJoint("l_shoulder_lift_joint", 0.3f);
+            safeSetJoint("l_upper_arm_roll_joint", 0.5f);
+            safeSetJoint("l_elbow_flex_joint", -1.0f);
+            safeSetJoint("l_forearm_roll_joint", 0.0f);
+            safeSetJoint("l_wrist_flex_joint", -0.5f);
+            safeSetJoint("l_wrist_roll_joint", 0.0f);
+
+            // Tracy LeftArm (UR5)
+            safeSetJoint("left_shoulder_pan_joint", 0.0f);
+            safeSetJoint("left_shoulder_lift_joint", -1.57f);
+            safeSetJoint("left_elbow_joint", 1.57f);
+            safeSetJoint("left_wrist_1_joint", -1.57f);
+            safeSetJoint("left_wrist_2_joint", 1.57f);
+            safeSetJoint("left_wrist_3_joint", 0.0f);
+
+            // TIAGo LeftArm
+            safeSetJoint("arm_left_1_joint", 0.2f);
+            safeSetJoint("arm_left_2_joint", -0.4f);
+            safeSetJoint("arm_left_3_joint", 0.4f);
+            safeSetJoint("arm_left_4_joint", 1.5f);
+            safeSetJoint("arm_left_5_joint", 1.5f);
+            safeSetJoint("arm_left_6_joint", 0.0f);
+            safeSetJoint("arm_left_7_joint", 0.0f);
+          }
+        }
       } else {
         RCLCPP_WARN(this->get_logger(),
                     "Kinematic chain '%s' not found. Skipping IK check.",
@@ -357,14 +480,32 @@ void GraspPlannerService::handle_service(
     RCLCPP_INFO(this->get_logger(), "Processing %d candidate grasps...",
                 (int)grasps->getSize());
 
+    std::vector<float> seedJointValues;
+    if (rns) {
+      seedJointValues = rns->getJointValues();
+    }
+
     for (size_t i = 0; i < grasps->getSize(); ++i) {
+      // Reset arm to seed configuration before solving IK for next grasp
+      if (rns && !seedJointValues.empty()) {
+        rns->setJointValues(seedJointValues);
+      }
+
       VirtualRobot::GraspPtr grasp = grasps->getGrasp(i);
       Eigen::Matrix4f global_tcp_pose =
           grasp->getTcpPoseGlobal(this->object->getGlobalPose());
 
+      // Reject grasps approaching from underneath (impossible on a tabletop/counter surface).
+      // In r_gripper_tool_frame, the +Z column (col 2) is the forward approach direction.
+      // If +Z has a large positive z-component, the gripper is pointing upwards from underneath.
+      if (global_tcp_pose(2, 2) > 0.5f) {
+        continue;
+      }
+
       // --- REACHABILITY CHECK ---
       if (ikSolver) {
-        ikSolver->setGoal(global_tcp_pose);
+        auto ikMode = (rns->getSize() >= 6) ? VirtualRobot::IKSolver::All : VirtualRobot::IKSolver::Position;
+        ikSolver->setGoal(global_tcp_pose, rns->getTCP(), ikMode);
         // Method: DifferentialIK::solveIK() attempts to find joint values that
         // satisfy the target pose.
         //         Returns true if error is below threshold.

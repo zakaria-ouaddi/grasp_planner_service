@@ -1,0 +1,786 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot name="pr2">
+
+  
+  <link name="base_footprint" />
+  <joint name="base_footprint_joint" type="fixed">
+    <origin xyz="0 0 0.051" rpy="0 0 0" />
+    <parent link="base_footprint" />
+    <child link="base_link" />
+  </joint>
+  <link name="base_link">
+    <visual><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/base_L.stl" /></geometry></visual>
+    <collision><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><box size="0.668 0.668 0.310" /></geometry></collision>
+    <inertial><mass value="116.0" />
+      <inertia ixx="5.652" ixy="-0.010" ixz="1.294" iyy="5.167" iyz="-0.008" izz="3.683" /></inertial>
+  </link>
+
+  
+  <joint name="torso_lift_joint" type="prismatic">
+    <origin xyz="-0.05 0 0.739675" rpy="0 0 0" />
+    <parent link="base_link" />
+    <child link="torso_lift_link" />
+    <axis xyz="0 0 1" />
+    <limit lower="0.0" upper="0.33" effort="10000" velocity="0.013" />
+    <dynamics damping="500.0" friction="1000.0" />
+  </joint>
+  <link name="torso_lift_link">
+    <visual><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/torso_lift_L.stl" /></geometry></visual>
+    <collision><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><box size="0.35 0.58 0.60" /></geometry></collision>
+    <inertial><mass value="27.928" />
+      <inertia ixx="0.4185" ixy="-0.0055" ixz="0.0651" iyy="0.4866" iyz="-0.0019" izz="0.1127" /></inertial>
+  </link>
+  <joint name="r_torso_lift_side_plate_joint" type="fixed">
+    <origin xyz="0.0535 -0.209285 0.176625" rpy="0 0 0" />
+    <parent link="torso_lift_link" /><child link="r_torso_lift_side_plate_link" />
+  </joint>
+  <link name="r_torso_lift_side_plate_link" />
+  <joint name="l_torso_lift_side_plate_joint" type="fixed">
+    <origin xyz="0.0535 0.209285 0.176625" rpy="0 0 0" />
+    <parent link="torso_lift_link" /><child link="l_torso_lift_side_plate_link" />
+  </joint>
+  <link name="l_torso_lift_side_plate_link" />
+
+  
+  <joint name="r_shoulder_pan_joint" type="revolute">
+    <origin xyz="0.0 -0.188 0.0" rpy="0 0 0" />
+    <parent link="torso_lift_link" /><child link="r_shoulder_pan_link" />
+    <axis xyz="0 0 1" />
+    <limit lower="-2.2853981634" upper="0.714601836603" effort="30" velocity="2.088" />
+    <dynamics damping="10.0" friction="0.0" />
+  </joint>
+  <link name="r_shoulder_pan_link">
+    <visual><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/shoulder_pan.stl" /></geometry></visual>
+    <collision><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/shoulder_pan.stl" /></geometry></collision>
+    <inertial><mass value="5.766" />
+      <inertia ixx="0.007578" ixy="-0.000051" ixz="-0.000092" iyy="0.007621" iyz="0.001475" izz="0.007854" /></inertial>
+  </link>
+  <joint name="r_shoulder_lift_joint" type="revolute">
+    <origin xyz="0.1 0 0" rpy="0 0 0" />
+    <parent link="r_shoulder_pan_link" /><child link="r_shoulder_lift_link" />
+    <axis xyz="0 1 0" />
+    <limit lower="-0.5236" upper="1.3963" effort="30" velocity="2.082" />
+    <dynamics damping="10.0" friction="0.0" />
+  </joint>
+  <link name="r_shoulder_lift_link">
+    <visual><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/shoulder_lift.stl" /></geometry></visual>
+    <collision><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/shoulder_lift.stl" /></geometry></collision>
+    <inertial><mass value="2.326" />
+      <inertia ixx="0.004891" ixy="0.000102" ixz="-0.000082" iyy="0.003847" iyz="-0.000048" izz="0.004397" /></inertial>
+  </link>
+  <joint name="r_upper_arm_roll_joint" type="revolute">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <parent link="r_shoulder_lift_link" /><child link="r_upper_arm_roll_link" />
+    <axis xyz="1 0 0" />
+    <limit lower="-3.9" upper="0.8" effort="30" velocity="3.27" />
+    <dynamics damping="10.0" friction="0.0" />
+  </joint>
+  <link name="r_upper_arm_roll_link">
+    <visual><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/upper_arm_roll.stl" /></geometry></visual>
+    <collision><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/upper_arm_roll_L.stl" /></geometry></collision>
+    <inertial><mass value="0.526" />
+      <inertia ixx="0.000611" ixy="0.0" ixz="0.0" iyy="0.000566" iyz="0.0" izz="0.000074" /></inertial>
+  </link>
+  <joint name="r_upper_arm_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <parent link="r_upper_arm_roll_link" /><child link="r_upper_arm_link" />
+  </joint>
+  <link name="r_upper_arm_link">
+    <visual><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/upper_arm.stl" /></geometry></visual>
+    <collision><origin xyz="0.21 0 0" rpy="0 1.5707963 0" />
+      <geometry><cylinder radius="0.06" length="0.38" /></geometry></collision>
+    <inertial><mass value="2.011" />
+      <inertia ixx="0.014739" ixy="0.000284" ixz="-0.000279" iyy="0.014801" iyz="0.000285" izz="0.000784" /></inertial>
+  </link>
+  <joint name="r_elbow_flex_joint" type="revolute">
+    <origin xyz="0.4 0 0" rpy="0 0 0" />
+    <parent link="r_upper_arm_link" /><child link="r_elbow_flex_link" />
+    <axis xyz="0 1 0" />
+    <limit lower="-2.3213" upper="0.00" effort="30" velocity="3.3" />
+    <dynamics damping="10.0" friction="0.0" />
+  </joint>
+  <link name="r_elbow_flex_link">
+    <visual><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/elbow_flex.stl" /></geometry></visual>
+    <collision><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/elbow_flex.stl" /></geometry></collision>
+    <inertial><mass value="2.121" />
+      <inertia ixx="0.007151" ixy="0.012083" ixz="-0.000353" iyy="0.007258" iyz="0.012042" izz="0.012077" /></inertial>
+  </link>
+  <joint name="r_forearm_roll_joint" type="continuous">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <parent link="r_elbow_flex_link" /><child link="r_forearm_roll_link" />
+    <axis xyz="1 0 0" />
+    <limit lower="-3.14159" upper="3.14159" effort="30" velocity="3.6" />
+    <dynamics damping="10.0" friction="0.0" />
+  </joint>
+  <link name="r_forearm_roll_link">
+    <visual><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/forearm_roll.stl" /></geometry></visual>
+    <collision><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/forearm_roll_L.stl" /></geometry></collision>
+    <inertial><mass value="0.463" />
+      <inertia ixx="0.000544" ixy="0.0" ixz="0.0" iyy="0.000536" iyz="0.0" izz="0.000076" /></inertial>
+  </link>
+  <joint name="r_forearm_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <parent link="r_forearm_roll_link" /><child link="r_forearm_link" />
+  </joint>
+  <link name="r_forearm_link">
+    <visual><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/forearm.stl" /></geometry></visual>
+    <collision><origin xyz="0.145 0 0" rpy="0 1.5707963 0" />
+      <geometry><cylinder radius="0.055" length="0.27" /></geometry></collision>
+    <inertial><mass value="2.690" />
+      <inertia ixx="0.005702" ixy="0.000316" ixz="0.000235" iyy="0.005903" iyz="0.000236" izz="0.000897" /></inertial>
+  </link>
+  <joint name="r_wrist_flex_joint" type="revolute">
+    <origin xyz="0.321 0 0" rpy="0 0 0" />
+    <parent link="r_forearm_link" /><child link="r_wrist_flex_link" />
+    <axis xyz="0 1 0" />
+    <limit lower="-2.18" upper="0.0" effort="10" velocity="3.078" />
+    <dynamics damping="10.0" friction="0.0" />
+  </joint>
+  <link name="r_wrist_flex_link">
+    <visual><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/wrist_flex.stl" /></geometry></visual>
+    <collision><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/wrist_flex.stl" /></geometry></collision>
+    <inertial><mass value="0.196" />
+      <inertia ixx="0.000400" ixy="0.0" ixz="0.0" iyy="0.000400" iyz="0.0" izz="0.000184" /></inertial>
+  </link>
+  <joint name="r_wrist_roll_joint" type="continuous">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <parent link="r_wrist_flex_link" /><child link="r_wrist_roll_link" />
+    <axis xyz="1 0 0" />
+    <limit lower="-3.14159" upper="3.14159" effort="10" velocity="3.6" />
+    <dynamics damping="10.0" friction="0.0" />
+  </joint>
+  <link name="r_wrist_roll_link">
+    <visual><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/wrist_roll.stl" /></geometry></visual>
+    <collision><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/wrist_roll_L.stl" /></geometry></collision>
+    <inertial><mass value="0.196" />
+      <inertia ixx="0.000400" ixy="0.0" ixz="0.0" iyy="0.000400" iyz="0.0" izz="0.000184" /></inertial>
+  </link>
+  
+  <joint name="r_gripper_palm_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <parent link="r_wrist_roll_link" /><child link="r_gripper_palm_link" />
+  </joint>
+  <link name="r_gripper_palm_link">
+    <visual><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/gripper_palm.stl" /></geometry></visual>
+    <collision><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/gripper_palm.stl" /></geometry></collision>
+    <inertial><mass value="0.58" />
+      <inertia ixx="0.000473" ixy="0.000027" ixz="0.000038" iyy="0.000484" iyz="0.0" izz="0.000234" /></inertial>
+  </link>
+  <joint name="r_gripper_tool_joint" type="fixed">
+    <origin xyz="0.13 0 0" rpy="0 1.5707963 0" />
+    <parent link="r_gripper_palm_link" /><child link="r_gripper_tool_frame" />
+  </joint>
+  <link name="r_gripper_tool_frame" />
+  <joint name="r_gripper_l_finger_joint" type="revolute">
+    <origin xyz="0.07691 0.01 0" rpy="0 0 0" />
+    <parent link="r_gripper_palm_link" /><child link="r_gripper_l_finger_link" />
+    <axis xyz="0 0 1" />
+    <limit lower="0.0" upper="0.548" effort="1000.0" velocity="0.5" />
+  </joint>
+  <link name="r_gripper_l_finger_link">
+    <visual><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/l_finger.stl" /></geometry></visual>
+    <collision><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/l_finger.stl" /></geometry></collision>
+    <inertial><mass value="0.17" />
+      <inertia ixx="0.0000723" ixy="-0.0000002" ixz="-0.0000012" iyy="0.0000284" iyz="0.000008" izz="0.0000700" /></inertial>
+  </link>
+  <joint name="r_gripper_r_finger_joint" type="revolute">
+    <origin xyz="0.07691 -0.01 0" rpy="0 0 0" />
+    <parent link="r_gripper_palm_link" /><child link="r_gripper_r_finger_link" />
+    <axis xyz="0 0 -1" />
+    <limit lower="0.0" upper="0.548" effort="1000.0" velocity="0.5" />
+  </joint>
+  <link name="r_gripper_r_finger_link">
+    <visual><origin xyz="0 0 0" rpy="3.14159265359 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/l_finger.stl" /></geometry></visual>
+    <collision><origin xyz="0 0 0" rpy="3.14159265359 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/l_finger.stl" /></geometry></collision>
+    <inertial><mass value="0.17" />
+      <inertia ixx="0.0000723" ixy="-0.0000002" ixz="-0.0000012" iyy="0.0000284" iyz="0.000008" izz="0.0000700" /></inertial>
+  </link>
+  <joint name="r_gripper_l_finger_tip_joint" type="revolute">
+    <origin xyz="0.09137 0.00495 0" rpy="0 0 0" />
+    <parent link="r_gripper_l_finger_link" /><child link="r_gripper_l_finger_tip_link" />
+    <axis xyz="0 0 -1" />
+    <limit lower="0.0" upper="0.548" effort="1000.0" velocity="0.5" />
+  </joint>
+  <link name="r_gripper_l_finger_tip_link">
+    <visual><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/l_finger_tip.stl" /></geometry></visual>
+    <collision><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/l_finger_tip.stl" /></geometry></collision>
+    <inertial><mass value="0.04" />
+      <inertia ixx="0.00000372" ixy="0.0" ixz="0.0" iyy="0.00000368" iyz="0.0" izz="0.00000105" /></inertial>
+  </link>
+  <joint name="r_gripper_r_finger_tip_joint" type="revolute">
+    <origin xyz="0.09137 -0.00495 0" rpy="0 0 0" />
+    <parent link="r_gripper_r_finger_link" /><child link="r_gripper_r_finger_tip_link" />
+    <axis xyz="0 0 1" />
+    <limit lower="0.0" upper="0.548" effort="1000.0" velocity="0.5" />
+  </joint>
+  <link name="r_gripper_r_finger_tip_link">
+    <visual><origin xyz="0 0 0" rpy="3.14159265359 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/l_finger_tip.stl" /></geometry></visual>
+    <collision><origin xyz="0 0 0" rpy="3.14159265359 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/l_finger_tip.stl" /></geometry></collision>
+    <inertial><mass value="0.04" />
+      <inertia ixx="0.00000372" ixy="0.0" ixz="0.0" iyy="0.00000368" iyz="0.0" izz="0.00000105" /></inertial>
+  </link>
+  
+  <joint name="l_shoulder_pan_joint" type="revolute">
+    <origin xyz="0.0 0.188 0.0" rpy="0 0 0" />
+    <parent link="torso_lift_link" /><child link="l_shoulder_pan_link" />
+    <axis xyz="0 0 1" />
+    <limit lower="-0.714601836603" upper="2.2853981634" effort="30" velocity="2.088" />
+    <dynamics damping="10.0" friction="0.0" />
+  </joint>
+  <link name="l_shoulder_pan_link">
+    <visual><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/shoulder_pan.stl" /></geometry></visual>
+    <collision><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/shoulder_pan.stl" /></geometry></collision>
+    <inertial><mass value="5.766" />
+      <inertia ixx="0.007578" ixy="-0.000051" ixz="-0.000092" iyy="0.007621" iyz="0.001475" izz="0.007854" /></inertial>
+  </link>
+  <joint name="l_shoulder_lift_joint" type="revolute">
+    <origin xyz="0.1 0 0" rpy="0 0 0" />
+    <parent link="l_shoulder_pan_link" /><child link="l_shoulder_lift_link" />
+    <axis xyz="0 1 0" />
+    <limit lower="-0.5236" upper="1.3963" effort="30" velocity="2.082" />
+    <dynamics damping="10.0" friction="0.0" />
+  </joint>
+  <link name="l_shoulder_lift_link">
+    <visual><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/shoulder_lift.stl" /></geometry></visual>
+    <collision><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/shoulder_lift.stl" /></geometry></collision>
+    <inertial><mass value="2.326" />
+      <inertia ixx="0.004891" ixy="0.000102" ixz="-0.000082" iyy="0.003847" iyz="-0.000048" izz="0.004397" /></inertial>
+  </link>
+  <joint name="l_upper_arm_roll_joint" type="revolute">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <parent link="l_shoulder_lift_link" /><child link="l_upper_arm_roll_link" />
+    <axis xyz="1 0 0" />
+    <limit lower="-0.8" upper="3.9" effort="30" velocity="3.27" />
+    <dynamics damping="10.0" friction="0.0" />
+  </joint>
+  <link name="l_upper_arm_roll_link">
+    <visual><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/upper_arm_roll.stl" /></geometry></visual>
+    <collision><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/upper_arm_roll_L.stl" /></geometry></collision>
+    <inertial><mass value="0.526" />
+      <inertia ixx="0.000611" ixy="0.0" ixz="0.0" iyy="0.000566" iyz="0.0" izz="0.000074" /></inertial>
+  </link>
+  <joint name="l_upper_arm_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <parent link="l_upper_arm_roll_link" /><child link="l_upper_arm_link" />
+  </joint>
+  <link name="l_upper_arm_link">
+    <visual><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/upper_arm.stl" /></geometry></visual>
+    <collision><origin xyz="0.21 0 0" rpy="0 1.5707963 0" />
+      <geometry><cylinder radius="0.06" length="0.38" /></geometry></collision>
+    <inertial><mass value="2.011" />
+      <inertia ixx="0.014739" ixy="0.000284" ixz="-0.000279" iyy="0.014801" iyz="0.000285" izz="0.000784" /></inertial>
+  </link>
+  <joint name="l_elbow_flex_joint" type="revolute">
+    <origin xyz="0.4 0 0" rpy="0 0 0" />
+    <parent link="l_upper_arm_link" /><child link="l_elbow_flex_link" />
+    <axis xyz="0 1 0" />
+    <limit lower="-2.3213" upper="0.00" effort="30" velocity="3.3" />
+    <dynamics damping="10.0" friction="0.0" />
+  </joint>
+  <link name="l_elbow_flex_link">
+    <visual><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/elbow_flex.stl" /></geometry></visual>
+    <collision><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/elbow_flex.stl" /></geometry></collision>
+    <inertial><mass value="2.121" />
+      <inertia ixx="0.007151" ixy="0.012083" ixz="-0.000353" iyy="0.007258" iyz="0.012042" izz="0.012077" /></inertial>
+  </link>
+  <joint name="l_forearm_roll_joint" type="continuous">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <parent link="l_elbow_flex_link" /><child link="l_forearm_roll_link" />
+    <axis xyz="1 0 0" />
+    <limit lower="-3.14159" upper="3.14159" effort="30" velocity="3.6" />
+    <dynamics damping="10.0" friction="0.0" />
+  </joint>
+  <link name="l_forearm_roll_link">
+    <visual><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/forearm_roll.stl" /></geometry></visual>
+    <collision><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/forearm_roll_L.stl" /></geometry></collision>
+    <inertial><mass value="0.463" />
+      <inertia ixx="0.000544" ixy="0.0" ixz="0.0" iyy="0.000536" iyz="0.0" izz="0.000076" /></inertial>
+  </link>
+  <joint name="l_forearm_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <parent link="l_forearm_roll_link" /><child link="l_forearm_link" />
+  </joint>
+  <link name="l_forearm_link">
+    <visual><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/forearm.stl" /></geometry></visual>
+    <collision><origin xyz="0.145 0 0" rpy="0 1.5707963 0" />
+      <geometry><cylinder radius="0.055" length="0.27" /></geometry></collision>
+    <inertial><mass value="2.690" />
+      <inertia ixx="0.005702" ixy="0.000316" ixz="0.000235" iyy="0.005903" iyz="0.000236" izz="0.000897" /></inertial>
+  </link>
+  <joint name="l_wrist_flex_joint" type="revolute">
+    <origin xyz="0.321 0 0" rpy="0 0 0" />
+    <parent link="l_forearm_link" /><child link="l_wrist_flex_link" />
+    <axis xyz="0 1 0" />
+    <limit lower="-2.18" upper="0.0" effort="10" velocity="3.078" />
+    <dynamics damping="10.0" friction="0.0" />
+  </joint>
+  <link name="l_wrist_flex_link">
+    <visual><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/wrist_flex.stl" /></geometry></visual>
+    <collision><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/wrist_flex.stl" /></geometry></collision>
+    <inertial><mass value="0.196" />
+      <inertia ixx="0.000400" ixy="0.0" ixz="0.0" iyy="0.000400" iyz="0.0" izz="0.000184" /></inertial>
+  </link>
+  <joint name="l_wrist_roll_joint" type="continuous">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <parent link="l_wrist_flex_link" /><child link="l_wrist_roll_link" />
+    <axis xyz="1 0 0" />
+    <limit lower="-3.14159" upper="3.14159" effort="10" velocity="3.6" />
+    <dynamics damping="10.0" friction="0.0" />
+  </joint>
+  <link name="l_wrist_roll_link">
+    <visual><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/wrist_roll.stl" /></geometry></visual>
+    <collision><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/wrist_roll_L.stl" /></geometry></collision>
+    <inertial><mass value="0.196" />
+      <inertia ixx="0.000400" ixy="0.0" ixz="0.0" iyy="0.000400" iyz="0.0" izz="0.000184" /></inertial>
+  </link>
+  
+  <joint name="l_gripper_palm_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <parent link="l_wrist_roll_link" /><child link="l_gripper_palm_link" />
+  </joint>
+  <link name="l_gripper_palm_link">
+    <visual><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/gripper_palm.stl" /></geometry></visual>
+    <collision><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/gripper_palm.stl" /></geometry></collision>
+    <inertial><mass value="0.58" />
+      <inertia ixx="0.000473" ixy="0.000027" ixz="0.000038" iyy="0.000484" iyz="0.0" izz="0.000234" /></inertial>
+  </link>
+  <joint name="l_gripper_tool_joint" type="fixed">
+    <origin xyz="0.13 0 0" rpy="0 1.5707963 0" />
+    <parent link="l_gripper_palm_link" /><child link="l_gripper_tool_frame" />
+  </joint>
+  <link name="l_gripper_tool_frame" />
+  <joint name="l_gripper_l_finger_joint" type="revolute">
+    <origin xyz="0.07691 0.01 0" rpy="0 0 0" />
+    <parent link="l_gripper_palm_link" /><child link="l_gripper_l_finger_link" />
+    <axis xyz="0 0 1" />
+    <limit lower="0.0" upper="0.548" effort="1000.0" velocity="0.5" />
+  </joint>
+  <link name="l_gripper_l_finger_link">
+    <visual><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/l_finger.stl" /></geometry></visual>
+    <collision><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/l_finger.stl" /></geometry></collision>
+    <inertial><mass value="0.17" />
+      <inertia ixx="0.0000723" ixy="-0.0000002" ixz="-0.0000012" iyy="0.0000284" iyz="0.000008" izz="0.0000700" /></inertial>
+  </link>
+  <joint name="l_gripper_r_finger_joint" type="revolute">
+    <origin xyz="0.07691 -0.01 0" rpy="0 0 0" />
+    <parent link="l_gripper_palm_link" /><child link="l_gripper_r_finger_link" />
+    <axis xyz="0 0 -1" />
+    <limit lower="0.0" upper="0.548" effort="1000.0" velocity="0.5" />
+  </joint>
+  <link name="l_gripper_r_finger_link">
+    <visual><origin xyz="0 0 0" rpy="3.14159265359 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/l_finger.stl" /></geometry></visual>
+    <collision><origin xyz="0 0 0" rpy="3.14159265359 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/l_finger.stl" /></geometry></collision>
+    <inertial><mass value="0.17" />
+      <inertia ixx="0.0000723" ixy="-0.0000002" ixz="-0.0000012" iyy="0.0000284" iyz="0.000008" izz="0.0000700" /></inertial>
+  </link>
+  <joint name="l_gripper_l_finger_tip_joint" type="revolute">
+    <origin xyz="0.09137 0.00495 0" rpy="0 0 0" />
+    <parent link="l_gripper_l_finger_link" /><child link="l_gripper_l_finger_tip_link" />
+    <axis xyz="0 0 -1" />
+    <limit lower="0.0" upper="0.548" effort="1000.0" velocity="0.5" />
+  </joint>
+  <link name="l_gripper_l_finger_tip_link">
+    <visual><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/l_finger_tip.stl" /></geometry></visual>
+    <collision><origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/l_finger_tip.stl" /></geometry></collision>
+    <inertial><mass value="0.04" />
+      <inertia ixx="0.00000372" ixy="0.0" ixz="0.0" iyy="0.00000368" iyz="0.0" izz="0.00000105" /></inertial>
+  </link>
+  <joint name="l_gripper_r_finger_tip_joint" type="revolute">
+    <origin xyz="0.09137 -0.00495 0" rpy="0 0 0" />
+    <parent link="l_gripper_r_finger_link" /><child link="l_gripper_r_finger_tip_link" />
+    <axis xyz="0 0 1" />
+    <limit lower="0.0" upper="0.548" effort="1000.0" velocity="0.5" />
+  </joint>
+  <link name="l_gripper_r_finger_tip_link">
+    <visual><origin xyz="0 0 0" rpy="3.14159265359 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/l_finger_tip.stl" /></geometry></visual>
+    <collision><origin xyz="0 0 0" rpy="3.14159265359 0 0" />
+      <geometry><mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/l_finger_tip.stl" /></geometry></collision>
+    <inertial><mass value="0.04" />
+      <inertia ixx="0.00000372" ixy="0.0" ixz="0.0" iyy="0.00000368" iyz="0.0" izz="0.00000105" /></inertial>
+  </link>
+<link name="head_pan_link">
+    <visual name="SM_head_pan_link_visual_0">
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+      <geometry>
+        <mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/head_pan_L.stl" />
+      </geometry>
+      <material name="SM_head_pan_link_visual_0_material">
+        <color rgba="0.9 0.9 0.9 1.0" />
+      </material>
+    </visual>
+    <collision name="SM_head_pan_link_collision_0">
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+      <geometry>
+        <mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/head_pan_L.stl" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="head_tilt_link">
+    <visual name="SM_head_tilt_link_visual_0">
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+      <geometry>
+        <mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/head_tilt_L.stl" />
+      </geometry>
+      <material name="SM_head_tilt_link_visual_0_material">
+        <color rgba="0.9 0.9 0.9 1.0" />
+      </material>
+    </visual>
+    <collision name="SM_head_tilt_link_collision_0">
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+      <geometry>
+        <mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/head_tilt_L.stl" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="laser_tilt_mount_link">
+    <visual name="SM_laser_tilt_mount_link_visual_0">
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+      <geometry>
+        <mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/tilting_hokuyo_L.stl" />
+      </geometry>
+      <material name="SM_laser_tilt_mount_link_visual_0_material">
+        <color rgba="0.9 0.9 0.9 1.0" />
+      </material>
+    </visual>
+    <collision name="SM_laser_tilt_mount_link_collision_0">
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+      <geometry>
+        <mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/tilting_hokuyo_L.stl" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="fl_caster_rotation_link">
+    <visual name="SM_fl_caster_rotation_link_visual_0">
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+      <geometry>
+        <mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/caster.stl" />
+      </geometry>
+      <material name="SM_fl_caster_rotation_link_visual_0_material">
+        <color rgba="0.9 0.9 0.9 1.0" />
+      </material>
+    </visual>
+    <collision name="SM_fl_caster_rotation_link_collision_0">
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+      <geometry>
+        <mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/caster_L.stl" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="fl_caster_l_wheel_link">
+    <collision name="SM_fl_caster_l_wheel_link_collision_0">
+      <origin xyz="0.0 0.0 0.0" rpy="1.5707963705062866 0.0 0.0" />
+      <geometry>
+        <cylinder radius="0.07479199767112732" length="0.03400000184774399" />
+      </geometry>
+    </collision>
+    <visual name="SM_fl_caster_l_wheel_link_visual_0">
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+      <geometry>
+        <mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/obj/wheel.obj" />
+      </geometry>
+      <material name="SM_fl_caster_l_wheel_link_visual_0_material">
+        <color rgba="0.9 0.9 0.9 1.0" />
+      </material>
+    </visual>
+  </link>
+  <link name="fl_caster_r_wheel_link">
+    <collision name="SM_fl_caster_r_wheel_link_collision_0">
+      <origin xyz="0.0 0.0 0.0" rpy="1.5707963705062866 0.0 0.0" />
+      <geometry>
+        <cylinder radius="0.07479199767112732" length="0.03400000184774399" />
+      </geometry>
+    </collision>
+    <visual name="SM_fl_caster_r_wheel_link_visual_0">
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+      <geometry>
+        <mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/obj/wheel.obj" />
+      </geometry>
+      <material name="SM_fl_caster_r_wheel_link_visual_0_material">
+        <color rgba="0.9 0.9 0.9 1.0" />
+      </material>
+    </visual>
+  </link>
+  <link name="fr_caster_rotation_link">
+    <visual name="SM_fr_caster_rotation_link_visual_0">
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+      <geometry>
+        <mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/caster.stl" />
+      </geometry>
+      <material name="SM_fr_caster_rotation_link_visual_0_material">
+        <color rgba="0.9 0.9 0.9 1.0" />
+      </material>
+    </visual>
+    <collision name="SM_fr_caster_rotation_link_collision_0">
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+      <geometry>
+        <mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/caster_L.stl" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="fr_caster_l_wheel_link">
+    <collision name="SM_fr_caster_l_wheel_link_collision_0">
+      <origin xyz="0.0 0.0 0.0" rpy="1.5707963705062866 0.0 0.0" />
+      <geometry>
+        <cylinder radius="0.07479199767112732" length="0.03400000184774399" />
+      </geometry>
+    </collision>
+    <visual name="SM_fr_caster_l_wheel_link_visual_0">
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+      <geometry>
+        <mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/obj/wheel.obj" />
+      </geometry>
+      <material name="SM_fr_caster_l_wheel_link_visual_0_material">
+        <color rgba="0.9 0.9 0.9 1.0" />
+      </material>
+    </visual>
+  </link>
+  <link name="fr_caster_r_wheel_link">
+    <collision name="SM_fr_caster_r_wheel_link_collision_0">
+      <origin xyz="0.0 0.0 0.0" rpy="1.5707963705062866 0.0 0.0" />
+      <geometry>
+        <cylinder radius="0.07479199767112732" length="0.03400000184774399" />
+      </geometry>
+    </collision>
+    <visual name="SM_fr_caster_r_wheel_link_visual_0">
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+      <geometry>
+        <mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/obj/wheel.obj" />
+      </geometry>
+      <material name="SM_fr_caster_r_wheel_link_visual_0_material">
+        <color rgba="0.9 0.9 0.9 1.0" />
+      </material>
+    </visual>
+  </link>
+  <link name="bl_caster_rotation_link">
+    <visual name="SM_bl_caster_rotation_link_visual_0">
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+      <geometry>
+        <mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/caster.stl" />
+      </geometry>
+      <material name="SM_bl_caster_rotation_link_visual_0_material">
+        <color rgba="0.9 0.9 0.9 1.0" />
+      </material>
+    </visual>
+    <collision name="SM_bl_caster_rotation_link_collision_0">
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+      <geometry>
+        <mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/caster_L.stl" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="bl_caster_l_wheel_link">
+    <collision name="SM_bl_caster_l_wheel_link_collision_0">
+      <origin xyz="0.0 0.0 0.0" rpy="1.5707963705062866 0.0 0.0" />
+      <geometry>
+        <cylinder radius="0.07479199767112732" length="0.03400000184774399" />
+      </geometry>
+    </collision>
+    <visual name="SM_bl_caster_l_wheel_link_visual_0">
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+      <geometry>
+        <mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/obj/wheel.obj" />
+      </geometry>
+      <material name="SM_bl_caster_l_wheel_link_visual_0_material">
+        <color rgba="0.9 0.9 0.9 1.0" />
+      </material>
+    </visual>
+  </link>
+  <link name="bl_caster_r_wheel_link">
+    <collision name="SM_bl_caster_r_wheel_link_collision_0">
+      <origin xyz="0.0 0.0 0.0" rpy="1.5707963705062866 0.0 0.0" />
+      <geometry>
+        <cylinder radius="0.07479199767112732" length="0.03400000184774399" />
+      </geometry>
+    </collision>
+    <visual name="SM_bl_caster_r_wheel_link_visual_0">
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+      <geometry>
+        <mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/obj/wheel.obj" />
+      </geometry>
+      <material name="SM_bl_caster_r_wheel_link_visual_0_material">
+        <color rgba="0.9 0.9 0.9 1.0" />
+      </material>
+    </visual>
+  </link>
+  <link name="br_caster_rotation_link">
+    <visual name="SM_br_caster_rotation_link_visual_0">
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+      <geometry>
+        <mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/caster.stl" />
+      </geometry>
+      <material name="SM_br_caster_rotation_link_visual_0_material">
+        <color rgba="0.9 0.9 0.9 1.0" />
+      </material>
+    </visual>
+    <collision name="SM_br_caster_rotation_link_collision_0">
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+      <geometry>
+        <mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/stl/caster_L.stl" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="br_caster_l_wheel_link">
+    <collision name="SM_br_caster_l_wheel_link_collision_0">
+      <origin xyz="0.0 0.0 0.0" rpy="1.5707963705062866 0.0 0.0" />
+      <geometry>
+        <cylinder radius="0.07479199767112732" length="0.03400000184774399" />
+      </geometry>
+    </collision>
+    <visual name="SM_br_caster_l_wheel_link_visual_0">
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+      <geometry>
+        <mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/obj/wheel.obj" />
+      </geometry>
+      <material name="SM_br_caster_l_wheel_link_visual_0_material">
+        <color rgba="0.9 0.9 0.9 1.0" />
+      </material>
+    </visual>
+  </link>
+  <link name="br_caster_r_wheel_link">
+    <collision name="SM_br_caster_r_wheel_link_collision_0">
+      <origin xyz="0.0 0.0 0.0" rpy="1.5707963705062866 0.0 0.0" />
+      <geometry>
+        <cylinder radius="0.07479199767112732" length="0.03400000184774399" />
+      </geometry>
+    </collision>
+    <visual name="SM_br_caster_r_wheel_link_visual_0">
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+      <geometry>
+        <mesh filename="/home/zakaria/grasp_planner/grasp_test_files/resources/robots/pr2_clean/meshes/obj/wheel.obj" />
+      </geometry>
+      <material name="SM_br_caster_r_wheel_link_visual_0_material">
+        <color rgba="0.9 0.9 0.9 1.0" />
+      </material>
+    </visual>
+  </link>
+  <joint name="fl_caster_rotation_link_joint" type="fixed">
+    <origin xyz="0.2246 0.2246 0.0282" rpy="0.0 0.0 0.0" />
+    <parent link="base_link" />
+    <child link="fl_caster_rotation_link" />
+  </joint>
+  <joint name="fl_caster_l_wheel_link_joint" type="fixed">
+    <origin xyz="0.0 0.049 0.0" rpy="0.0 0.0 0.0" />
+    <parent link="fl_caster_rotation_link" />
+    <child link="fl_caster_l_wheel_link" />
+  </joint>
+  <joint name="fl_caster_r_wheel_link_joint" type="fixed">
+    <origin xyz="0.0 -0.049 0.0" rpy="0.0 0.0 0.0" />
+    <parent link="fl_caster_rotation_link" />
+    <child link="fl_caster_r_wheel_link" />
+  </joint>
+  <joint name="fr_caster_rotation_link_joint" type="fixed">
+    <origin xyz="0.2246 -0.2246 0.0282" rpy="0.0 0.0 0.0" />
+    <parent link="base_link" />
+    <child link="fr_caster_rotation_link" />
+  </joint>
+  <joint name="fr_caster_l_wheel_link_joint" type="fixed">
+    <origin xyz="0.0 0.049 0.0" rpy="0.0 0.0 0.0" />
+    <parent link="fr_caster_rotation_link" />
+    <child link="fr_caster_l_wheel_link" />
+  </joint>
+  <joint name="fr_caster_r_wheel_link_joint" type="fixed">
+    <origin xyz="0.0 -0.049 0.0" rpy="0.0 0.0 0.0" />
+    <parent link="fr_caster_rotation_link" />
+    <child link="fr_caster_r_wheel_link" />
+  </joint>
+  <joint name="bl_caster_rotation_link_joint" type="fixed">
+    <origin xyz="-0.2246 0.2246 0.0282" rpy="0.0 0.0 0.0" />
+    <parent link="base_link" />
+    <child link="bl_caster_rotation_link" />
+  </joint>
+  <joint name="bl_caster_l_wheel_link_joint" type="fixed">
+    <origin xyz="0.0 0.049 0.0" rpy="0.0 0.0 0.0" />
+    <parent link="bl_caster_rotation_link" />
+    <child link="bl_caster_l_wheel_link" />
+  </joint>
+  <joint name="bl_caster_r_wheel_link_joint" type="fixed">
+    <origin xyz="0.0 -0.049 0.0" rpy="0.0 0.0 0.0" />
+    <parent link="bl_caster_rotation_link" />
+    <child link="bl_caster_r_wheel_link" />
+  </joint>
+  <joint name="br_caster_rotation_link_joint" type="fixed">
+    <origin xyz="-0.2246 -0.2246 0.0282" rpy="0.0 0.0 0.0" />
+    <parent link="base_link" />
+    <child link="br_caster_rotation_link" />
+  </joint>
+  <joint name="br_caster_l_wheel_link_joint" type="fixed">
+    <origin xyz="0.0 0.049 0.0" rpy="0.0 0.0 0.0" />
+    <parent link="br_caster_rotation_link" />
+    <child link="br_caster_l_wheel_link" />
+  </joint>
+  <joint name="br_caster_r_wheel_link_joint" type="fixed">
+    <origin xyz="0.0 -0.049 0.0" rpy="0.0 0.0 0.0" />
+    <parent link="br_caster_rotation_link" />
+    <child link="br_caster_r_wheel_link" />
+  </joint>
+  <joint name="head_pan_link_joint" type="fixed">
+    <origin xyz="-0.01707 0.0 0.38145" rpy="0.0 0.0 0.0" />
+    <parent link="torso_lift_link" />
+    <child link="head_pan_link" />
+  </joint>
+  <joint name="head_tilt_link_joint" type="fixed">
+    <origin xyz="0.068 0.0 0.0" rpy="0.0 0.0 0.0" />
+    <parent link="head_pan_link" />
+    <child link="head_tilt_link" />
+  </joint>
+  <joint name="laser_tilt_mount_link_joint" type="fixed">
+    <origin xyz="0.09893 0.0 0.227" rpy="0.0 0.0 0.0" />
+    <parent link="torso_lift_link" />
+    <child link="laser_tilt_mount_link" />
+  </joint>
+  </robot>

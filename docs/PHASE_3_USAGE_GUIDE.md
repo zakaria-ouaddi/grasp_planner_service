@@ -2,6 +2,12 @@
 
 This guide provides step-by-step instructions to launch the full Grasp Planner system (Service + GUI + Visualization).
 
+## Prerequisites
+- **OS**: Ubuntu 20.04 / 22.04 (Linux)
+- **ROS2**: Humble / Iron
+- **Simox**: Installed and built in `~/local` or system path.
+- **Python**: `python3` with `tkinter` installed (`sudo apt install python3-tk`).
+
 ## 1. Setup Environment
 Open 3 separate terminals. In *each* terminal, source your workspace:
 
@@ -42,8 +48,8 @@ python3 grasp_planner_gui/gui_client.py
 ## 3. Running a Grasp Plan
 
 1.  **Configure GUI**:
-    - **Robot XML**: Ensure it points to: `/grasp_planner/grasp_test_files/robots/ArmarIII/ArmarIII.xml`
-    - **Object XML**: Ensure it points to: `/grasp_planner/grasp_test_files/objects/test_cube.xml`
+    - **Robot XML**: Ensure it points to: `/home/zakaria/grasp_planner/grasp_test_files/robots/ArmarIII/ArmarIII.xml`
+    - **Object XML**: Ensure it points to: `/home/zakaria/grasp_planner/grasp_test_files/objects/test_cube.xml`
     - **Kinematic Chain**: `TorsoRightArm`
     - **EEF Name**: `Hand R`
     - **Preshape**: `Power Preshape`

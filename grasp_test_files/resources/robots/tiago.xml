@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Simox Robot XML Wrapper for PAL Robotics TIAGo Dual-Arm Manipulator -->
+<Robot Type="tiago" StandardName="tiago" RootNode="SimoxURDFLoader">
+    <RobotNode name="SimoxURDFLoader">
+        <ChildFromRobot>
+            <File importEEF="true">tiago_for_simox.urdf</File>
+        </ChildFromRobot>
+    </RobotNode>
+
+    <!-- Right End-Effector: PAL Parallel Gripper -->
+    <EndEffector name="r_gripper" base="gripper_right_link" tcp="r_gripper_gcp" gcp="r_gripper_gcp">
+        <Preshape name="Open">
+            <Node name="gripper_right_left_finger_joint" unit="mm" value="45.0"/>
+            <Node name="gripper_right_right_finger_joint" unit="mm" value="45.0"/>
+        </Preshape>
+        <Preshape name="open">
+            <Node name="gripper_right_left_finger_joint" unit="mm" value="45.0"/>
+            <Node name="gripper_right_right_finger_joint" unit="mm" value="45.0"/>
+        </Preshape>
+        <Preshape name="Power Preshape">
+            <Node name="gripper_right_left_finger_joint" unit="mm" value="45.0"/>
+            <Node name="gripper_right_right_finger_joint" unit="mm" value="45.0"/>
+        </Preshape>
+        <Preshape name="Precision Preshape">
+            <Node name="gripper_right_left_finger_joint" unit="mm" value="45.0"/>
+            <Node name="gripper_right_right_finger_joint" unit="mm" value="45.0"/>
+        </Preshape>
+        <Preshape name="Closed">
+            <Node name="gripper_right_left_finger_joint" unit="mm" value="0.0"/>
+            <Node name="gripper_right_right_finger_joint" unit="mm" value="0.0"/>
+        </Preshape>
+        <Preshape name="closed">
+            <Node name="gripper_right_left_finger_joint" unit="mm" value="0.0"/>
+            <Node name="gripper_right_right_finger_joint" unit="mm" value="0.0"/>
+        </Preshape>
+        <Static>
+            <Node name="gripper_right_link"/>
+        </Static>
+        <Actor name="LeftFinger">
+            <Node name="gripper_right_left_finger_joint" direction="-50"/>
+            <Node name="gripper_right_left_finger_link" considerCollisions="All"/>
+        </Actor>
+        <Actor name="RightFinger">
+            <Node name="gripper_right_right_finger_joint" direction="-50"/>
+            <Node name="gripper_right_right_finger_link" considerCollisions="All"/>
+        </Actor>
+    </EndEffector>
+
+    <!-- Left End-Effector: PAL Parallel Gripper -->
+    <EndEffector name="l_gripper" base="gripper_left_link" tcp="l_gripper_gcp" gcp="l_gripper_gcp">
+        <Preshape name="Open">
+            <Node name="gripper_left_left_finger_joint" unit="mm" value="45.0"/>
+            <Node name="gripper_left_right_finger_joint" unit="mm" value="45.0"/>
+        </Preshape>
+        <Preshape name="open">
+            <Node name="gripper_left_left_finger_joint" unit="mm" value="45.0"/>
+            <Node name="gripper_left_right_finger_joint" unit="mm" value="45.0"/>
+        </Preshape>
+        <Preshape name="Power Preshape">
+            <Node name="gripper_left_left_finger_joint" unit="mm" value="45.0"/>
+            <Node name="gripper_left_right_finger_joint" unit="mm" value="45.0"/>
+        </Preshape>
+        <Preshape name="Precision Preshape">
+            <Node name="gripper_left_left_finger_joint" unit="mm" value="45.0"/>
+            <Node name="gripper_left_right_finger_joint" unit="mm" value="45.0"/>
+        </Preshape>
+        <Preshape name="Closed">
+            <Node name="gripper_left_left_finger_joint" unit="mm" value="0.0"/>
+            <Node name="gripper_left_right_finger_joint" unit="mm" value="0.0"/>
+        </Preshape>
+        <Preshape name="closed">
+            <Node name="gripper_left_left_finger_joint" unit="mm" value="0.0"/>
+            <Node name="gripper_left_right_finger_joint" unit="mm" value="0.0"/>
+        </Preshape>
+        <Static>
+            <Node name="gripper_left_link"/>
+        </Static>
+        <Actor name="LeftFinger">
+            <Node name="gripper_left_left_finger_joint" direction="-50"/>
+            <Node name="gripper_left_left_finger_link" considerCollisions="All"/>
+        </Actor>
+        <Actor name="RightFinger">
+            <Node name="gripper_left_right_finger_joint" direction="-50"/>
+            <Node name="gripper_left_right_finger_link" considerCollisions="All"/>
+        </Actor>
+    </EndEffector>
+
+    <!-- Kinematic Chains for Arms -->
+    <RobotNodeSet name="RightArm" kinematicRoot="torso_lift_link" tcp="r_gripper_gcp">
+        <Node name="arm_right_1_joint"/>
+        <Node name="arm_right_2_joint"/>
+        <Node name="arm_right_3_joint"/>
+        <Node name="arm_right_4_joint"/>
+        <Node name="arm_right_5_joint"/>
+        <Node name="arm_right_6_joint"/>
+        <Node name="arm_right_7_joint"/>
+    </RobotNodeSet>
+
+    <RobotNodeSet name="LeftArm" kinematicRoot="torso_lift_link" tcp="l_gripper_gcp">
+        <Node name="arm_left_1_joint"/>
+        <Node name="arm_left_2_joint"/>
+        <Node name="arm_left_3_joint"/>
+        <Node name="arm_left_4_joint"/>
+        <Node name="arm_left_5_joint"/>
+        <Node name="arm_left_6_joint"/>
+        <Node name="arm_left_7_joint"/>
+    </RobotNodeSet>
+</Robot>

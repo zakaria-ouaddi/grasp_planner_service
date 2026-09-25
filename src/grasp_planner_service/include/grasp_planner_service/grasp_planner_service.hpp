@@ -24,6 +24,7 @@
 #include <VirtualRobot/VirtualRobotException.h>
 #include <VirtualRobot/XML/ObjectIO.h>
 #include <VirtualRobot/XML/RobotIO.h>
+#include <VirtualRobot/Import/URDF/SimoxURDFFactory.h>
 
 // Include the new conversion helpers
 #include "grasp_planner_service/conversion_helpers.hpp"

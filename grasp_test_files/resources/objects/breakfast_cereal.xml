@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ManipulationObject name="breakfast_cereal">
+    <Visualization>
+        <File type="stl">breakfast_cereal.stl</File>
+    </Visualization>
+    <CollisionModel>
+        <File type="stl">breakfast_cereal.stl</File>
+    </CollisionModel>
+    <GraspSet name="Simox_r_gripper" RobotType="PR2" EndEffector="r_gripper"/>
+    <GraspSet name="Simox_l_gripper" RobotType="PR2" EndEffector="l_gripper"/>
+</ManipulationObject>

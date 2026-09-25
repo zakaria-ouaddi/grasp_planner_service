@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Robot Type="PR2" StandardName="pr2" RootNode="SimoxURDFLoader">
+    <RobotNode name="SimoxURDFLoader">
+        <ChildFromRobot>
+            <File importEEF="true">pr2_for_simox.urdf</File>
+        </ChildFromRobot>
+    </RobotNode>
+
+    <RobotNodeSet name="RightArm" kinematicRoot="torso_lift_link" tcp="r_gripper_tool_frame">
+        <Node name="r_shoulder_pan_joint"/>
+        <Node name="r_shoulder_lift_joint"/>
+        <Node name="r_upper_arm_roll_joint"/>
+        <Node name="r_elbow_flex_joint"/>
+        <Node name="r_forearm_roll_joint"/>
+        <Node name="r_wrist_flex_joint"/>
+        <Node name="r_wrist_roll_joint"/>
+    </RobotNodeSet>
+
+    <RobotNodeSet name="LeftArm" kinematicRoot="torso_lift_link" tcp="l_gripper_tool_frame">
+        <Node name="l_shoulder_pan_joint"/>
+        <Node name="l_shoulder_lift_joint"/>
+        <Node name="l_upper_arm_roll_joint"/>
+        <Node name="l_elbow_flex_joint"/>
+        <Node name="l_forearm_roll_joint"/>
+        <Node name="l_wrist_flex_joint"/>
+        <Node name="l_wrist_roll_joint"/>
+    </RobotNodeSet>
+
+    <EndEffector name="r_gripper" base="r_gripper_palm_link" tcp="r_gripper_tool_frame" gcp="r_gripper_tool_frame">
+        <Preshape name="Open">
+            <Node name="r_gripper_l_finger_joint"     unit="radian" value="0.54"/>
+            <Node name="r_gripper_r_finger_joint"     unit="radian" value="0.54"/>
+            <Node name="r_gripper_l_finger_tip_joint" unit="radian" value="0.54"/>
+            <Node name="r_gripper_r_finger_tip_joint" unit="radian" value="0.54"/>
+        </Preshape>
+        <Preshape name="open">
+            <Node name="r_gripper_l_finger_joint"     unit="radian" value="0.54"/>
+            <Node name="r_gripper_r_finger_joint"     unit="radian" value="0.54"/>
+            <Node name="r_gripper_l_finger_tip_joint" unit="radian" value="0.54"/>
+            <Node name="r_gripper_r_finger_tip_joint" unit="radian" value="0.54"/>
+        </Preshape>
+        <Preshape name="Power Preshape">
+            <Node name="r_gripper_l_finger_joint"     unit="radian" value="0.54"/>
+            <Node name="r_gripper_r_finger_joint"     unit="radian" value="0.54"/>
+            <Node name="r_gripper_l_finger_tip_joint" unit="radian" value="0.54"/>
+            <Node name="r_gripper_r_finger_tip_joint" unit="radian" value="0.54"/>
+        </Preshape>
+        <Preshape name="Closed">
+            <Node name="r_gripper_l_finger_joint"     unit="radian" value="0.0"/>
+            <Node name="r_gripper_r_finger_joint"     unit="radian" value="0.0"/>
+            <Node name="r_gripper_l_finger_tip_joint" unit="radian" value="0.0"/>
+            <Node name="r_gripper_r_finger_tip_joint" unit="radian" value="0.0"/>
+        </Preshape>
+        <Preshape name="closed">
+            <Node name="r_gripper_l_finger_joint"     unit="radian" value="0.0"/>
+            <Node name="r_gripper_r_finger_joint"     unit="radian" value="0.0"/>
+            <Node name="r_gripper_l_finger_tip_joint" unit="radian" value="0.0"/>
+            <Node name="r_gripper_r_finger_tip_joint" unit="radian" value="0.0"/>
+        </Preshape>
+        <Static>
+            <Node name="r_gripper_palm_link"/>
+        </Static>
+        <Actor name="LeftFinger">
+            <Node name="r_gripper_l_finger_joint"     direction="-1"/>
+            <Node name="r_gripper_l_finger_tip_joint" direction="-1"/>
+            <Node name="r_gripper_l_finger_tip_link"  considerCollisions="All"/>
+        </Actor>
+        <Actor name="RightFinger">
+            <Node name="r_gripper_r_finger_joint"     direction="-1"/>
+            <Node name="r_gripper_r_finger_tip_joint" direction="-1"/>
+            <Node name="r_gripper_r_finger_tip_link"  considerCollisions="All"/>
+        </Actor>
+    </EndEffector>
+
+    <EndEffector name="l_gripper" base="l_gripper_palm_link" tcp="l_gripper_tool_frame" gcp="l_gripper_tool_frame">
+        <Preshape name="Open">
+            <Node name="l_gripper_l_finger_joint"     unit="radian" value="0.54"/>
+            <Node name="l_gripper_r_finger_joint"     unit="radian" value="0.54"/>
+            <Node name="l_gripper_l_finger_tip_joint" unit="radian" value="0.54"/>
+            <Node name="l_gripper_r_finger_tip_joint" unit="radian" value="0.54"/>
+        </Preshape>
+        <Preshape name="open">
+            <Node name="l_gripper_l_finger_joint"     unit="radian" value="0.54"/>
+            <Node name="l_gripper_r_finger_joint"     unit="radian" value="0.54"/>
+            <Node name="l_gripper_l_finger_tip_joint" unit="radian" value="0.54"/>
+            <Node name="l_gripper_r_finger_tip_joint" unit="radian" value="0.54"/>
+        </Preshape>
+        <Preshape name="Power Preshape">
+            <Node name="l_gripper_l_finger_joint"     unit="radian" value="0.54"/>
+            <Node name="l_gripper_r_finger_joint"     unit="radian" value="0.54"/>
+            <Node name="l_gripper_l_finger_tip_joint" unit="radian" value="0.54"/>
+            <Node name="l_gripper_r_finger_tip_joint" unit="radian" value="0.54"/>
+        </Preshape>
+        <Preshape name="Closed">
+            <Node name="l_gripper_l_finger_joint"     unit="radian" value="0.0"/>
+            <Node name="l_gripper_r_finger_joint"     unit="radian" value="0.0"/>
+            <Node name="l_gripper_l_finger_tip_joint" unit="radian" value="0.0"/>
+            <Node name="l_gripper_r_finger_tip_joint" unit="radian" value="0.0"/>
+        </Preshape>
+        <Preshape name="closed">
+            <Node name="l_gripper_l_finger_joint"     unit="radian" value="0.0"/>
+            <Node name="l_gripper_r_finger_joint"     unit="radian" value="0.0"/>
+            <Node name="l_gripper_l_finger_tip_joint" unit="radian" value="0.0"/>
+            <Node name="l_gripper_r_finger_tip_joint" unit="radian" value="0.0"/>
+        </Preshape>
+        <Static>
+            <Node name="l_gripper_palm_link"/>
+        </Static>
+        <Actor name="LeftFinger">
+            <Node name="l_gripper_l_finger_joint"     direction="-1"/>
+            <Node name="l_gripper_l_finger_tip_joint" direction="-1"/>
+            <Node name="l_gripper_l_finger_tip_link"  considerCollisions="All"/>
+        </Actor>
+        <Actor name="RightFinger">
+            <Node name="l_gripper_r_finger_joint"     direction="-1"/>
+            <Node name="l_gripper_r_finger_tip_joint" direction="-1"/>
+            <Node name="l_gripper_r_finger_tip_link"  considerCollisions="All"/>
+        </Actor>
+    </EndEffector>
+
+</Robot>

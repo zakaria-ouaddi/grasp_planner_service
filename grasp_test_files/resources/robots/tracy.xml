@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Simox Robot XML Wrapper for IAI Tracy (Dual Universal Robots UR5 + Robotiq 85) -->
+<Robot Type="tracy" StandardName="tracy" RootNode="SimoxURDFLoader">
+    <RobotNode name="SimoxURDFLoader">
+        <ChildFromRobot>
+            <File importEEF="true">tracy_for_simox.urdf</File>
+        </ChildFromRobot>
+    </RobotNode>
+
+    <!-- Right End-Effector: Robotiq 2F-85 Gripper -->
+    <EndEffector name="r_gripper" base="right_robotiq_85_base_link" tcp="r_gripper_gcp" gcp="r_gripper_gcp">
+        <Preshape name="Open">
+            <Node name="right_robotiq_85_left_knuckle_joint" unit="radian" value="0.0"/>
+            <Node name="right_robotiq_85_right_knuckle_joint" unit="radian" value="0.0"/>
+        </Preshape>
+        <Preshape name="open">
+            <Node name="right_robotiq_85_left_knuckle_joint" unit="radian" value="0.0"/>
+            <Node name="right_robotiq_85_right_knuckle_joint" unit="radian" value="0.0"/>
+        </Preshape>
+        <Preshape name="Power Preshape">
+            <Node name="right_robotiq_85_left_knuckle_joint" unit="radian" value="0.0"/>
+            <Node name="right_robotiq_85_right_knuckle_joint" unit="radian" value="0.0"/>
+        </Preshape>
+        <Preshape name="Precision Preshape">
+            <Node name="right_robotiq_85_left_knuckle_joint" unit="radian" value="0.0"/>
+            <Node name="right_robotiq_85_right_knuckle_joint" unit="radian" value="0.0"/>
+        </Preshape>
+        <Preshape name="Closed">
+            <Node name="right_robotiq_85_left_knuckle_joint" unit="radian" value="0.8"/>
+            <Node name="right_robotiq_85_right_knuckle_joint" unit="radian" value="-0.8"/>
+            <Node name="right_robotiq_85_left_finger_tip_joint" unit="radian" value="-0.8"/>
+            <Node name="right_robotiq_85_right_finger_tip_joint" unit="radian" value="0.8"/>
+        </Preshape>
+        <Preshape name="closed">
+            <Node name="right_robotiq_85_left_knuckle_joint" unit="radian" value="0.8"/>
+            <Node name="right_robotiq_85_right_knuckle_joint" unit="radian" value="-0.8"/>
+            <Node name="right_robotiq_85_left_finger_tip_joint" unit="radian" value="-0.8"/>
+            <Node name="right_robotiq_85_right_finger_tip_joint" unit="radian" value="0.8"/>
+        </Preshape>
+        <Static>
+            <Node name="right_robotiq_85_base_link"/>
+        </Static>
+        <Actor name="LeftFinger">
+            <Node name="right_robotiq_85_left_knuckle_joint" direction="1"/>
+            <Node name="right_robotiq_85_left_finger_tip_joint" direction="-1"/>
+            <Node name="right_robotiq_85_left_finger_tip_link" considerCollisions="All"/>
+        </Actor>
+        <Actor name="RightFinger">
+            <Node name="right_robotiq_85_right_knuckle_joint" direction="-1"/>
+            <Node name="right_robotiq_85_right_finger_tip_joint" direction="1"/>
+            <Node name="right_robotiq_85_right_finger_tip_link" considerCollisions="All"/>
+        </Actor>
+    </EndEffector>
+
+    <!-- Kinematic Chain for Right Arm (UR5 6-DOF) -->
+    <RobotNodeSet name="RightArm" kinematicRoot="table" tcp="r_gripper_gcp">
+        <Node name="right_shoulder_pan_joint"/>
+        <Node name="right_shoulder_lift_joint"/>
+        <Node name="right_elbow_joint"/>
+        <Node name="right_wrist_1_joint"/>
+        <Node name="right_wrist_2_joint"/>
+        <Node name="right_wrist_3_joint"/>
+    </RobotNodeSet>
+</Robot>

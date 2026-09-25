@@ -20,12 +20,12 @@
 int main(int argc, char **argv) {
   rclcpp::init(argc, argv);
 
-  // Multi-threaded executor for parallel processing
-  rclcpp::executors::MultiThreadedExecutor executor;
+  // Single-threaded executor for safe sequential processing with Simox
+  rclcpp::executors::SingleThreadedExecutor executor;
   auto node = std::make_shared<grasp_planner_service::GraspPlannerService>();
 
   RCLCPP_INFO(node->get_logger(),
-              "Starting Grasp Planner Service (MultiThreaded)");
+              "Starting Grasp Planner Service (SingleThreaded)");
   executor.add_node(node);
   executor.spin();
 

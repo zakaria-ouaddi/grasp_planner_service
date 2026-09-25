@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Simox Robot XML Wrapper for Hello Robot Stretch (RE1 / RE2) -->
+<Robot Type="stretch" StandardName="stretch" RootNode="SimoxURDFLoader">
+    <RobotNode name="SimoxURDFLoader">
+        <ChildFromRobot>
+            <File importEEF="true">stretch_for_simox.urdf</File>
+        </ChildFromRobot>
+    </RobotNode>
+
+    <!-- End-Effector: Stretch Gripper -->
+    <EndEffector name="r_gripper" base="link_straight_gripper" tcp="r_gripper_gcp" gcp="r_gripper_gcp">
+        <Preshape name="Open">
+            <Node name="joint_gripper_finger_left" unit="radian" value="0.5"/>
+            <Node name="joint_gripper_finger_right" unit="radian" value="0.5"/>
+        </Preshape>
+        <Preshape name="open">
+            <Node name="joint_gripper_finger_left" unit="radian" value="0.5"/>
+            <Node name="joint_gripper_finger_right" unit="radian" value="0.5"/>
+        </Preshape>
+        <Preshape name="Power Preshape">
+            <Node name="joint_gripper_finger_left" unit="radian" value="0.5"/>
+            <Node name="joint_gripper_finger_right" unit="radian" value="0.5"/>
+        </Preshape>
+        <Preshape name="Precision Preshape">
+            <Node name="joint_gripper_finger_left" unit="radian" value="0.5"/>
+            <Node name="joint_gripper_finger_right" unit="radian" value="0.5"/>
+        </Preshape>
+        <Preshape name="Closed">
+            <Node name="joint_gripper_finger_left" unit="radian" value="-0.5"/>
+            <Node name="joint_gripper_finger_right" unit="radian" value="-0.5"/>
+        </Preshape>
+        <Preshape name="closed">
+            <Node name="joint_gripper_finger_left" unit="radian" value="-0.5"/>
+            <Node name="joint_gripper_finger_right" unit="radian" value="-0.5"/>
+        </Preshape>
+        <Static>
+            <Node name="link_straight_gripper"/>
+        </Static>
+        <Actor name="LeftFinger">
+            <Node name="joint_gripper_finger_left" direction="-1"/>
+            <Node name="link_gripper_finger_left" considerCollisions="All"/>
+            <Node name="link_gripper_fingertip_left" considerCollisions="All"/>
+        </Actor>
+        <Actor name="RightFinger">
+            <Node name="joint_gripper_finger_right" direction="-1"/>
+            <Node name="link_gripper_finger_right" considerCollisions="All"/>
+            <Node name="link_gripper_fingertip_right" considerCollisions="All"/>
+        </Actor>
+    </EndEffector>
+
+    <!-- Kinematic Chain for Arm (telescoping arm + wrist DOFs) -->
+    <RobotNodeSet name="Arm" kinematicRoot="base_link" tcp="r_gripper_gcp">
+        <Node name="joint_lift"/>
+        <Node name="joint_arm_l3"/>
+        <Node name="joint_arm_l2"/>
+        <Node name="joint_arm_l1"/>
+        <Node name="joint_arm_l0"/>
+        <Node name="joint_wrist_yaw"/>
+        <Node name="joint_wrist_pitch"/>
+        <Node name="joint_wrist_roll"/>
+    </RobotNodeSet>
+    <!-- Alias RightArm to Arm so both names work seamlessly -->
+    <RobotNodeSet name="RightArm" kinematicRoot="base_link" tcp="r_gripper_gcp">
+        <Node name="joint_lift"/>
+        <Node name="joint_arm_l3"/>
+        <Node name="joint_arm_l2"/>
+        <Node name="joint_arm_l1"/>
+        <Node name="joint_arm_l0"/>
+        <Node name="joint_wrist_yaw"/>
+        <Node name="joint_wrist_pitch"/>
+        <Node name="joint_wrist_roll"/>
+    </RobotNodeSet>
+</Robot>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ManipulationObject name="apartment_bowl">
+    <Visualization>
+        <File type="inventor">apartment_bowl.stl</File>
+        <Scale><Vec3 x="1000" y="1000" z="1000"/></Scale>
+    </Visualization>
+    <CollisionModel>
+        <File type="inventor">apartment_bowl.stl</File>
+        <Scale><Vec3 x="1000" y="1000" z="1000"/></Scale>
+    </CollisionModel>
+</ManipulationObject>

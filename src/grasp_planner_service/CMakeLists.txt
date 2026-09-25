@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.8)
 project(grasp_planner_service)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+set(CMAKE_INSTALL_RPATH "/home/zakaria/local/simox-urdf/lib;/home/zakaria/local/lib")
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -23,7 +25,7 @@ find_package(eigen3_cmake_module REQUIRED)
 # Find Simox and its core dependencies
 find_package(Boost REQUIRED COMPONENTS program_options thread regex system filesystem)
 find_package(Eigen3 REQUIRED)
-find_package(Simox REQUIRED COMPONENTS VirtualRobot GraspStudio)  # Explicitly request Simox components
+find_package(Simox REQUIRED COMPONENTS VirtualRobot GraspStudio SimoxURDF)  # Explicitly request Simox components
 
 # Include directories
 include_directories(
