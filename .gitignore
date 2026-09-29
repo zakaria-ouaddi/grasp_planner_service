@@ -49,3 +49,48 @@ qtcreator-*
 
 # Catkin custom files
 CATKIN_IGNORE
+
+# Colcon and ROS 2 build artifacts
+build/
+install/
+log/
+logs/
+
+# Python cache and environments
+__pycache__/
+*.py[cod]
+*$py.class
+.cache/
+.ruff_cache/
+
+# IDE files
+.vscode/
+.idea/
+
+# Binary executables compiled from test/debug cpp files
+scripts/debug_grasp
+scripts/debug_hsrb
+scripts/debug_pr2_tracy
+scripts/debug_stretch
+scripts/debug_stretch_poses
+scripts/debug_tiago
+scripts/test_destruct
+scripts/test_fk
+scripts/test_full_lifecycle
+scripts/test_lifecycle_order
+scripts/test_load_two
+reproduce_urdf_fail
+scratch_check_robot
+scratch_test_vis_pose
+
+# Logs and scratch output
+*.log
+*.logcd
+ldd_output.txt
+tri_mesh_model_header_view.txt
+.living_worlds_tally/
+
+# Embedded external packages
+grasp_test_files/iai_pr2/
+
+
